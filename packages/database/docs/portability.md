@@ -16,7 +16,7 @@ The portability middleware currently targets result normalization concerns:
 - Right-trim of string values
 - Column name case normalization (lower/upper)
 
-Exposed via the `@devscast/datazen/portability` namespace (`Middleware`, `Driver`, `Connection`, `Converter`).
+Exposed via the `@ngandu-dev/database/portability` namespace (`Middleware`, `Driver`, `Connection`, `Converter`).
 
 Connection Wrapper
 ------------------
@@ -28,8 +28,8 @@ import {
   ColumnCase,
   Configuration,
   DriverManager,
-} from "@devscast/datazen";
-import * as Portability from "@devscast/datazen/portability";
+} from "@ngandu-dev/database";
+import * as Portability from "@ngandu-dev/database/portability";
 
 const configuration = new Configuration().addMiddleware(
   new Portability.Middleware(
@@ -61,7 +61,7 @@ Enable only the flags you need.
 Platform Layer
 --------------
 
-SQL portability is handled separately by platform classes (`@devscast/datazen/platforms`):
+SQL portability is handled separately by platform classes (`@ngandu-dev/database/platforms`):
 
 - SQL function and expression generation
 - limit/offset adaptation
@@ -74,7 +74,7 @@ matters.
 Platform Optimizations
 ----------------------
 
-`OptimizeFlags` from `@devscast/datazen/portability` applies vendor-specific optimization masks.
+`OptimizeFlags` from `@ngandu-dev/database/portability` applies vendor-specific optimization masks.
 Example: Oracle already treats empty strings specially, so the
 `EMPTY_TO_NULL` portability flag is masked out for Oracle.
 
@@ -83,12 +83,12 @@ Keyword Lists
 
 Doctrine exposes vendor keyword lists through schema-related APIs.
 In this port, keyword lists are available through platform APIs such as
-`platform.getReservedKeywordsList()` and the `@devscast/datazen/platforms`
+`platform.getReservedKeywordsList()` and the `@ngandu-dev/database/platforms`
 namespace keyword classes.
 
 Related Modules
 ---------------
 
-- Types portability/conversion: `@devscast/datazen/types`
-- Parameter style and list expansion portability: `ExpandArrayParameters` from `@devscast/datazen`
-- SQL parsing support: `@devscast/datazen/sql`
+- Types portability/conversion: `@ngandu-dev/database/types`
+- Parameter style and list expansion portability: `ExpandArrayParameters` from `@ngandu-dev/database`
+- SQL parsing support: `@ngandu-dev/database/sql`

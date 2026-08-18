@@ -6,7 +6,7 @@ import { UnionSQLBuilder } from "./union-sql-builder";
 export class DefaultUnionSQLBuilder implements UnionSQLBuilder {
   constructor(private readonly platform: AbstractPlatform) {}
 
-  buildSQL(query: UnionQuery): string {
+  public buildSQL(query: UnionQuery): string {
     const parts: string[] = [];
 
     for (const union of query.unionParts) {

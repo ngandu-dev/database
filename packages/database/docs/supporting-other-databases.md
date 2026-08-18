@@ -124,7 +124,7 @@ Using your custom driver without DriverManager changes
 You can avoid touching `DriverManager` map and pass your driver directly:
 
 ```ts
-import { DriverManager } from "@devscast/datazen";
+import { DriverManager } from "@ngandu-dev/database";
 
 const conn = DriverManager.getConnection({
   driverInstance: new CustomDriver(),

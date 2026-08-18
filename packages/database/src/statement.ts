@@ -2,7 +2,7 @@ import type { Connection } from "./connection";
 import type { Statement as DriverStatement } from "./driver/statement";
 import { ParameterType } from "./parameter-type";
 import type { AbstractPlatform } from "./platforms/abstract-platform";
-import type { QueryParameterTypes, QueryParameters, QueryScalarParameterType } from "./query";
+import type { QueryParameters, QueryParameterTypes, QueryScalarParameterType } from "./query";
 import { Result } from "./result";
 import { Type } from "./types/type";
 

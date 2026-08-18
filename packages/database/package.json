@@ -1,132 +1,152 @@
 {
-  "name": "@devscast/datazen",
-  "version": "1.1.4",
+  "name": "@ngandu-dev/database",
+  "version": "2.0.0",
+  "description": "A TypeScript database abstraction layer inspired by Doctrine DBAL.",
+  "license": "MIT",
+  "author": "Bernard Ngandu <bernard@ngandu.dev>",
   "type": "module",
+  "sideEffects": false,
   "source": "./src/_index.ts",
   "main": "./dist/index.cjs",
-  "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "default": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./connections": {
-      "types": "./dist/connections.d.ts",
-      "import": "./dist/connections.js",
-      "require": "./dist/connections.cjs",
-      "default": "./dist/connections.js"
+      "import": {
+        "types": "./dist/connections.d.ts",
+        "default": "./dist/connections.js"
+      },
+      "require": {
+        "types": "./dist/connections.d.cts",
+        "default": "./dist/connections.cjs"
+      }
     },
     "./driver": {
-      "types": "./dist/driver.d.ts",
-      "import": "./dist/driver.js",
-      "require": "./dist/driver.cjs",
-      "default": "./dist/driver.js"
+      "import": {
+        "types": "./dist/driver.d.ts",
+        "default": "./dist/driver.js"
+      },
+      "require": {
+        "types": "./dist/driver.d.cts",
+        "default": "./dist/driver.cjs"
+      }
     },
     "./exception": {
-      "types": "./dist/exception.d.ts",
-      "import": "./dist/exception.js",
-      "require": "./dist/exception.cjs",
-      "default": "./dist/exception.js"
+      "import": {
+        "types": "./dist/exception.d.ts",
+        "default": "./dist/exception.js"
+      },
+      "require": {
+        "types": "./dist/exception.d.cts",
+        "default": "./dist/exception.cjs"
+      }
     },
     "./logging": {
-      "types": "./dist/logging.d.ts",
-      "import": "./dist/logging.js",
-      "require": "./dist/logging.cjs",
-      "default": "./dist/logging.js"
+      "import": {
+        "types": "./dist/logging.d.ts",
+        "default": "./dist/logging.js"
+      },
+      "require": {
+        "types": "./dist/logging.d.cts",
+        "default": "./dist/logging.cjs"
+      }
     },
     "./platforms": {
-      "types": "./dist/platforms.d.ts",
-      "import": "./dist/platforms.js",
-      "require": "./dist/platforms.cjs",
-      "default": "./dist/platforms.js"
+      "import": {
+        "types": "./dist/platforms.d.ts",
+        "default": "./dist/platforms.js"
+      },
+      "require": {
+        "types": "./dist/platforms.d.cts",
+        "default": "./dist/platforms.cjs"
+      }
     },
     "./portability": {
-      "types": "./dist/portability.d.ts",
-      "import": "./dist/portability.js",
-      "require": "./dist/portability.cjs",
-      "default": "./dist/portability.js"
+      "import": {
+        "types": "./dist/portability.d.ts",
+        "default": "./dist/portability.js"
+      },
+      "require": {
+        "types": "./dist/portability.d.cts",
+        "default": "./dist/portability.cjs"
+      }
     },
     "./query": {
-      "types": "./dist/query.d.ts",
-      "import": "./dist/query.js",
-      "require": "./dist/query.cjs",
-      "default": "./dist/query.js"
+      "import": {
+        "types": "./dist/query.d.ts",
+        "default": "./dist/query.js"
+      },
+      "require": {
+        "types": "./dist/query.d.cts",
+        "default": "./dist/query.cjs"
+      }
     },
     "./tools": {
-      "types": "./dist/tools.d.ts",
-      "import": "./dist/tools.js",
-      "require": "./dist/tools.cjs",
-      "default": "./dist/tools.js"
+      "import": {
+        "types": "./dist/tools.d.ts",
+        "default": "./dist/tools.js"
+      },
+      "require": {
+        "types": "./dist/tools.d.cts",
+        "default": "./dist/tools.cjs"
+      }
     },
     "./types": {
-      "types": "./dist/types.d.ts",
-      "import": "./dist/types.js",
-      "require": "./dist/types.cjs",
-      "default": "./dist/types.js"
+      "import": {
+        "types": "./dist/types.d.ts",
+        "default": "./dist/types.js"
+      },
+      "require": {
+        "types": "./dist/types.d.cts",
+        "default": "./dist/types.cjs"
+      }
     },
     "./package.json": "./package.json"
-  },
-  "typesVersions": {
-    "*": {
-      "connections": [
-        "./dist/connections.d.ts"
-      ],
-      "driver": [
-        "./dist/driver.d.ts"
-      ],
-      "exception": [
-        "./dist/exception.d.ts"
-      ],
-      "logging": [
-        "./dist/logging.d.ts"
-      ],
-      "platforms": [
-        "./dist/platforms.d.ts"
-      ],
-      "portability": [
-        "./dist/portability.d.ts"
-      ],
-      "query": [
-        "./dist/query.d.ts"
-      ],
-      "tools": [
-        "./dist/tools.d.ts"
-      ],
-      "types": [
-        "./dist/types.d.ts"
-      ]
-    }
   },
   "files": [
     "dist",
     "README.md",
-    "package.json"
+    "LICENSE",
+    "CHANGELOG.md"
   ],
-  "devDependencies": {
-    "@biomejs/biome": "^2.4.7",
-    "@changesets/cli": "^2.30.0",
-    "@commitlint/cli": "^20.5.0",
-    "@commitlint/config-conventional": "^20.5.0",
-    "@types/bun": "latest",
-    "@types/mssql": "^9.1.9",
-    "@types/node": "^25.5.0",
-    "@types/pg": "^8.18.0",
-    "@types/semver": "^7.7.1",
-    "@types/sqlite3": "^5.1.0",
-    "@typescript-eslint/eslint-plugin": "^8.57.1",
-    "@typescript-eslint/parser": "^8.57.1",
-    "@vitest/coverage-v8": "^4.1.0",
-    "commitizen": "^4.3.1",
-    "cz-conventional-changelog": "^3.3.0",
-    "husky": "^9.1.7",
-    "mssql": "^12.2.0",
-    "mysql2": "^3.20.0",
-    "pg": "^8.20.0",
-    "tsup": "^8.5.1",
-    "vitest": "^4.1.0"
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup --minify",
+    "dev": "tsup --watch",
+    "format": "biome check --write src scripts",
+    "lint": "biome lint src scripts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --config vitest.unit.config.ts",
+    "test:all": "vitest run",
+    "test:coverage": "vitest run --config vitest.unit.config.ts --coverage",
+    "test:functional": "bun scripts/test-functional.mjs",
+    "test:functional:local": "bun scripts/test-functional-local.mjs",
+    "check:package": "publint && attw --pack . --profile node16"
+  },
+  "keywords": [
+    "database",
+    "dbal",
+    "sql",
+    "mysql",
+    "postgresql",
+    "sqlite",
+    "sql-server"
+  ],
+  "dependencies": {
+    "@ngandu-dev/query-builder": "workspace:*",
+    "semver": "^7.7.4"
   },
   "peerDependencies": {
     "mssql": "^12.2.0",
@@ -148,54 +168,17 @@
       "optional": true
     }
   },
-  "scripts": {
-    "build": "tsup --minify",
-    "dev": "tsup --watch",
-    "test": "vitest run --config vitest.unit.config.ts",
-    "test:all": "vitest run",
-    "test:functional": "bun scripts/test-functional.mjs",
-    "test:functional:local": "bun scripts/test-functional-local.mjs",
-    "test:coverage": "vitest run --config vitest.unit.config.ts --coverage",
-    "test:watch": "vitest",
-    "============= HUSKY =============": "",
-    "prepare": "husky",
-    "commit": "cz",
-    "=========== CODE STYLE ============": "",
-    "lint": "biome check && biome lint",
-    "format": "biome format --write && biome check --write && biome lint --write",
-    "typecheck": "tsc --noEmit",
-    "=========== NPM PUBLISH ==============": "",
-    "release": "npm run build && npm publish --access public",
-    "version": "changeset version"
-  },
-  "lint-staged": {
-    "*.ts": [
-      "prettier --write",
-      "eslint --fix"
-    ]
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
-  },
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
-  },
-  "author": "Bernard Ngandu <bernard@devscast.tech>",
-  "license": "MIT",
-  "description": "DataZen : TypeScript Database Abstraction Layer",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/devscast/datazen-ts.git"
+    "url": "git+https://github.com/ngandu-dev/database.git",
+    "directory": "packages/database"
   },
   "bugs": {
-    "url": "https://github.com/devscast/datazen-ts/issues"
+    "url": "https://github.com/ngandu-dev/database/issues"
   },
-  "homepage": "https://github.com/devscast/datazen-ts#readme",
-  "dependencies": {
-    "semver": "^7.7.4"
+  "homepage": "https://github.com/ngandu-dev/database/tree/main/packages/database#readme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

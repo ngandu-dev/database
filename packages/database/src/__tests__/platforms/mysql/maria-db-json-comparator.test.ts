@@ -70,11 +70,14 @@ describe("MySQL MariaDBJsonComparatorTest parity (Doctrine adapted)", () => {
     ["B", "C", createTableB, createTableC],
     ["B", "D", createTableB, createTableD],
     ["C", "D", createTableC, createTableD],
-  ])("considers tables %s and %s identical for JSON collation comparison", (_a, _b, makeLeft, makeRight) => {
-    const diff = createComparator().compareTables(makeLeft(), makeRight());
+  ])(
+    "considers tables %s and %s identical for JSON collation comparison",
+    (_a, _b, makeLeft, makeRight) => {
+      const diff = createComparator().compareTables(makeLeft(), makeRight());
 
-    expect(diff === null || diff.isEmpty()).toBe(true);
-  });
+      expect(diff === null || diff.isEmpty()).toBe(true);
+    },
+  );
 });
 
 function jsonColumn(name: string, collation?: string): Column {

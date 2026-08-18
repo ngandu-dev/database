@@ -2,7 +2,7 @@ import { Configuration } from "../configuration";
 import { Connection } from "../connection";
 import type { Driver } from "../driver";
 import type { Connection as DriverConnection } from "../driver/connection";
-import type { QueryParameterTypes, QueryParameters } from "../query";
+import type { QueryParameters, QueryParameterTypes } from "../query";
 import type { Statement } from "../statement";
 
 type OverrideParams = Record<string, unknown>;

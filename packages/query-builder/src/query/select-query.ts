@@ -13,4 +13,40 @@ export class SelectQuery {
     public readonly limit: Limit,
     public readonly forUpdate: ForUpdate | null,
   ) {}
+
+  public isDistinct(): boolean {
+    return this.distinct;
+  }
+
+  public getColumns(): string[] {
+    return [...this.columns];
+  }
+
+  public getFrom(): string[] {
+    return [...this.from];
+  }
+
+  public getWhere(): string | null {
+    return this.where;
+  }
+
+  public getGroupBy(): string[] {
+    return [...this.groupBy];
+  }
+
+  public getHaving(): string | null {
+    return this.having;
+  }
+
+  public getOrderBy(): string[] {
+    return [...this.orderBy];
+  }
+
+  public getLimit(): Limit {
+    return this.limit;
+  }
+
+  public getForUpdate(): ForUpdate | null {
+    return this.forUpdate;
+  }
 }

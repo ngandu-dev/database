@@ -1,19 +1,8 @@
 {
-  "include": ["./src"],
-  "exclude": ["__tests__"],
+  "extends": "../../tsconfig.base.json",
+  "include": ["src"],
+  "exclude": ["src/__tests__"],
   "compilerOptions": {
-    "module": "nodenext",
-    "target": "esnext",
-    "lib": ["esnext"],
-    "declaration": true,
-    "strict": true,
-    "moduleResolution": "nodenext",
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "noUncheckedIndexedAccess": true,
-    "noEmit": true,
-    "outDir": "dist",
-    "rootDir": "src",
+    "outDir": "dist"
   }
 }

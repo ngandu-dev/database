@@ -1,4 +1,4 @@
-# @devscast/datazen
+# @ngandu-dev/database
 
 ## Rules
 - Keep one class/interface per file.

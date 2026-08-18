@@ -148,13 +148,16 @@ describe("Schema/Index (Doctrine parity, supported scenarios)", () => {
     [["column"], [32], [64], false],
     [["column1", "column2"], [32], [undefined, 32], false],
     [["column1", "column2"], [null, 32], [undefined, 32], true],
-  ])("checks fulfillment with indexed column lengths %#", (columns, lengths1, lengths2, expected) => {
-    const index1 = new Index("index1", columns, false, false, [], { lengths: lengths1 });
-    const index2 = new Index("index2", columns, false, false, [], { lengths: lengths2 });
+  ])(
+    "checks fulfillment with indexed column lengths %#",
+    (columns, lengths1, lengths2, expected) => {
+      const index1 = new Index("index1", columns, false, false, [], { lengths: lengths1 });
+      const index2 = new Index("index2", columns, false, false, [], { lengths: lengths2 });
 
-    expect(index1.isFulfilledBy(index2)).toBe(expected);
-    expect(index2.isFulfilledBy(index1)).toBe(expected);
-  });
+      expect(index1.isFulfilledBy(index2)).toBe(expected);
+      expect(index2.isFulfilledBy(index1)).toBe(expected);
+    },
+  );
 
   it.each([
     [() => new Index("idx_empty", []).getIndexedColumns()],

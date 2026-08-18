@@ -85,18 +85,21 @@ describe("Functional/PortabilityTest", () => {
   it.each([
     ["Test_Int", [1, 2]],
     ["Test_String", ["foo", "foo"]],
-  ] as const)("supports fetchFirstColumn portability conversion for %s", async (column, expected) => {
-    const connection = await connectWithPortability(
-      functional,
-      extraConnections,
-      PortabilityConnection.PORTABILITY_RTRIM,
-      null,
-    );
-    await createPortabilityTable(connection);
+  ] as const)(
+    "supports fetchFirstColumn portability conversion for %s",
+    async (column, expected) => {
+      const connection = await connectWithPortability(
+        functional,
+        extraConnections,
+        PortabilityConnection.PORTABILITY_RTRIM,
+        null,
+      );
+      await createPortabilityTable(connection);
 
-    const result = await connection.executeQuery(`SELECT ${column} FROM portability_table`);
-    expect(result.fetchFirstColumn()).toEqual(expected);
-  });
+      const result = await connection.executeQuery(`SELECT ${column} FROM portability_table`);
+      expect(result.fetchFirstColumn()).toEqual(expected);
+    },
+  );
 
   it("supports empty-to-null conversion", async () => {
     const connection = await connectWithPortability(

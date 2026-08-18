@@ -85,8 +85,8 @@ Customizing the Platform
 Option 1: pass a custom platform directly in connection params.
 
 ```ts
-import { DriverManager } from "@devscast/datazen";
-import { MySQLPlatform } from "@devscast/datazen/platforms";
+import { DriverManager } from "@ngandu-dev/database";
+import { MySQLPlatform } from "@ngandu-dev/database/platforms";
 
 class CustomMySQLPlatform extends MySQLPlatform {
   // override methods as needed
@@ -106,12 +106,12 @@ import {
   type Driver
   Configuration,
   DriverManager,
-} from "@devscast/datazen";
+} from "@ngandu-dev/database";
 import {
   type Connection as DriverConnection,
   type Middleware as DriverMiddleware,
-} from "@devscast/datazen/driver";
-import { SQLServerPlatform } from "@devscast/datazen/platforms";
+} from "@ngandu-dev/database/driver";
+import { SQLServerPlatform } from "@ngandu-dev/database/platforms";
 
 class CustomSQLServerPlatform extends SQLServerPlatform {}
 

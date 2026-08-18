@@ -8,7 +8,7 @@ Use `DriverManager` to create a `Connection`.
 
 ```ts
 import mysql from "mysql2/promise";
-import { DriverManager } from "@devscast/datazen";
+import { DriverManager } from "@ngandu-dev/database";
 
 const pool = mysql.createPool({
   database: "mydb",
@@ -34,8 +34,8 @@ You can parse a DSN first, then pass the result to `DriverManager`.
 
 ```ts
 import mysql from "mysql2/promise";
-import { DriverManager } from "@devscast/datazen";
-import { DsnParser } from "@devscast/datazen/tools";
+import { DriverManager } from "@ngandu-dev/database";
+import { DsnParser } from "@ngandu-dev/database/tools";
 
 const parser = new DsnParser();
 const params = parser.parse("mysql2://user:secret@localhost/mydb?charset=utf8mb4");
@@ -163,7 +163,7 @@ Connecting using a URL (DSN)
 Examples:
 
 ```ts
-import { DsnParser } from "@devscast/datazen/tools";
+import { DsnParser } from "@ngandu-dev/database/tools";
 
 const parser = new DsnParser({
   custom: CustomDriver, // driverClass mapping
@@ -186,12 +186,12 @@ import {
   ColumnCase,
   Configuration,
   DriverManager,
-} from "@devscast/datazen";
-import { Middleware as LoggingMiddleware } from "@devscast/datazen/logging";
+} from "@ngandu-dev/database";
+import { Middleware as LoggingMiddleware } from "@ngandu-dev/database/logging";
 import {
   Connection as PortabilityConnection,
   Middleware as PortabilityMiddleware,
-} from "@devscast/datazen/portability";
+} from "@ngandu-dev/database/portability";
 
 const configuration = new Configuration()
   .addMiddleware(new LoggingMiddleware())
@@ -207,8 +207,8 @@ const conn = DriverManager.getConnection({ driver: "mssql", pool }, configuratio
 
 Supported built-in middlewares:
 
-- Logging (`@devscast/datazen/logging`)
-- Portability (`@devscast/datazen/portability`)
+- Logging (`@ngandu-dev/database/logging`)
+- Portability (`@ngandu-dev/database/portability`)
 
 Auto-commit Default
 -------------------
@@ -216,7 +216,7 @@ Auto-commit Default
 `Configuration` can set the default connection auto-commit mode:
 
 ```ts
-import { Configuration, DriverManager } from "@devscast/datazen";
+import { Configuration, DriverManager } from "@ngandu-dev/database";
 
 const configuration = new Configuration({ autoCommit: false });
 const conn = DriverManager.getConnection({ driver: "mysql2", pool }, configuration);
@@ -252,7 +252,7 @@ for routing reads to replicas and writes/transactions to the primary.
 Create it through `DriverManager`:
 
 ```ts
-import { DriverManager } from "@devscast/datazen";
+import { DriverManager } from "@ngandu-dev/database";
 
 const conn = DriverManager.getPrimaryReadReplicaConnection({
   driver: "mysql2",

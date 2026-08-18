@@ -1,119 +1,90 @@
-# DataZen: TypeScript Database Abstraction Layer
+# @ngandu-dev/database
 
-![npm](https://img.shields.io/npm/v/@devscast/datazen?style=flat-square)
-![npm](https://img.shields.io/npm/dt/@devscast/datazen?style=flat-square)
-[![Lint](https://github.com/devscast/datazen-ts/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/devscast/datazen-ts/actions/workflows/lint.yml)
-[![Tests](https://github.com/devscast/datazen-ts/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/devscast/datazen-ts/actions/workflows/test.yml)
-[![ci](https://github.com/devscast/datazen-ts/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/devscast/datazen-ts/actions/workflows/ci.yml)
-![GitHub](https://img.shields.io/github/license/devscast/datazen-ts?style=flat-square)
+[![npm](https://img.shields.io/npm/v/@ngandu-dev/database)](https://www.npmjs.com/package/@ngandu-dev/database)
+[![downloads](https://img.shields.io/npm/dt/@ngandu-dev/database)](https://www.npmjs.com/package/@ngandu-dev/database)
+[![Tests](https://github.com/ngandu-dev/database/actions/workflows/test.yml/badge.svg)](https://github.com/ngandu-dev/database/actions/workflows/test.yml)
+[![License](https://img.shields.io/npm/l/@ngandu-dev/database)](LICENSE)
 
-DataZen is a TypeScript-first DBAL (Database Abstraction Layer) inspired by Doctrine DBAL.
-It targets teams who want SQL-first development with a stable runtime abstraction,
-without adopting a full ORM.
+A TypeScript database abstraction layer with connections, drivers, platforms, schema tools, portable types, and transactions.
+
+## Features
+
+- MySQL, MariaDB, PostgreSQL, SQLite, and SQL Server drivers
+- Query execution, prepared statements, transactions, and read replicas
+- Schema inspection and manipulation
+- Portable database types, logging middleware, and result conversion
+- Query construction through `@ngandu-dev/query-builder`
+
+## Requirements
+
+- Node.js 20 or newer
+- One supported database driver for the database you use
 
 ## Installation
 
-Using Bun:
-
-```bash
-bun add @devscast/datazen mysql2
+```sh
+bun add @ngandu-dev/database mysql2
 ```
 
-For SQL Server projects:
+Use `pg`, `sqlite3`, or `mssql` instead of `mysql2` for another platform.
 
-```bash
-bun add @devscast/datazen mssql
-```
-
-Other supported runtime drivers include `pg` and `sqlite3`.
-
-`mysql2`, `mssql`, `pg`, and `sqlite3` are optional peer dependencies so
-applications control driver versions and only install the runtime adapters they
-actually use.
-
-## Documentation
-
-- [Introduction](docs/introduction.md)
-- [Doctrine/Datazen Parity Notes](docs/parity-matrix.md)
-- [Architecture](docs/architecture.md)
-- [Configuration](docs/configuration.md)
-- [Data Retrieval and Manipulation](docs/data-retrieval-and-manipulation.md)
-- [Query Builder](docs/query-builder.md)
-- [Types](docs/types.md)
-- [Portability](docs/portability.md)
-- [Platforms](docs/platforms.md)
-- [Transactions](docs/transactions.md)
-- [Security](docs/security.md)
-- [Known Vendor Issues](docs/known-vendor-issues.md)
-- [Supporting Other Databases](docs/supporting-other-databases.md)
-
-## Quick Start (MySQL)
+## Quick start
 
 ```ts
-import mysql from "mysql2/promise";
-import { DriverManager } from "@devscast/datazen";
+import { DriverManager } from "@ngandu-dev/database";
 
-const pool = mysql.createPool({
-  database: "mydb",
-  host: "localhost",
-  password: "secret",
-  user: "user",
-});
-
-const conn = DriverManager.getConnection({
+const connection = DriverManager.getConnection({
   driver: "mysql2",
-  pool,
-});
-
-const value = await conn.fetchOne("SELECT 1");
-```
-
-Doctrine examples are often synchronous (PHP request model). In DataZen/Node,
-I/O methods are async (`await` connection/statement/query-builder execution),
-while `Result` fetch/iterate methods are synchronous once a result is available.
-
-## Quick Start (SQL Server)
-
-```ts
-import sql from "mssql";
-import { DriverManager } from "@devscast/datazen";
-
-const pool = await sql.connect({
-  database: "mydb",
-  options: { encrypt: true, trustServerCertificate: true },
+  host: "127.0.0.1",
+  database: "app",
+  user: "app",
   password: "secret",
-  server: "localhost",
-  user: "user",
 });
 
-const conn = DriverManager.getConnection({
-  driver: "mssql",
-  pool,
-});
-
-const value = await conn.fetchOne("SELECT 1");
-```
-
-## Query Builder Example
-
-```ts
-const qb = conn
+const users = await connection
   .createQueryBuilder()
-  .select("u.id", "u.email")
-  .from("users", "u")
-  .where("u.email = :email")
-  .setParameter("email", "john@example.com");
-
-const user = await qb.fetchAssociative();
+  .select("id", "email")
+  .from("users")
+  .where("active = :active")
+  .setParameter("active", true)
+  .fetchAllAssociative();
 ```
 
-## Attribution
+## Usage
 
-This project is fully inspired by the architecture and design of `doctrine/dbal`.
-DataZen is an independent TypeScript/Node implementation and is not affiliated with Doctrine.
+Detailed guides are available in [`docs/`](docs), including configuration, transactions, platforms, portability, types, and schema support.
+
+## Development
+
+From the monorepo root:
+
+```sh
+bun install --frozen-lockfile
+bun run --filter @ngandu-dev/database format
+bun run --filter @ngandu-dev/database typecheck
+```
+
+## Testing
+
+```sh
+bun run --filter @ngandu-dev/database test
+bun run --filter @ngandu-dev/database test:functional:local
+```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) and the repository pull request template.
+
+## Security
+
+Please report vulnerabilities privately according to [SECURITY.md](SECURITY.md).
+
+## License
+
+Released under the [MIT License](LICENSE).
 
 ## Contributors
 
-<a href="https://github.com/devscast/datazen-ts/graphs/contributors" title="show all contributors">
-  <img src="https://contrib.rocks/image?repo=devscast/datazen-ts" alt="contributors"/>
+<a href="https://github.com/ngandu-dev/database/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=ngandu-dev/database" alt="Contributors" />
 </a>

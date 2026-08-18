@@ -17,9 +17,9 @@ import { ExpandArrayParameters } from "./expand-array-parameters";
 import { ParameterType } from "./parameter-type";
 import { AbstractPlatform } from "./platforms/abstract-platform";
 import type {
+  QueryParameters,
   QueryParameterType,
   QueryParameterTypes,
-  QueryParameters,
   QueryScalarParameterType,
 } from "./query";
 import { Query } from "./query";

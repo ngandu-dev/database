@@ -112,7 +112,7 @@ Datazen exposes transaction isolation APIs on `Connection`:
 Platform classes do provide isolation SQL generation:
 
 ```ts
-import { TransactionIsolationLevel } from "@devscast/datazen";
+import { TransactionIsolationLevel } from "@ngandu-dev/database";
 
 const platform = conn.getDatabasePlatform();
 await conn.executeStatement(

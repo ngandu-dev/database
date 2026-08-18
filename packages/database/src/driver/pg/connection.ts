@@ -7,7 +7,7 @@ import type { Result as DriverResult } from "../result";
 import type { Statement as DriverStatement } from "../statement";
 import { Result as PgResult } from "./result";
 import { PgStatement } from "./statement";
-import type { PgPoolClientLike, PgPoolLike, PgQueryResultLike, PgQueryableLike } from "./types";
+import type { PgPoolClientLike, PgPoolLike, PgQueryableLike, PgQueryResultLike } from "./types";
 
 export class PgConnection implements DriverConnection {
   private readonly parser = new Parser(false);

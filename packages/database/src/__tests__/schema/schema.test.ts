@@ -24,8 +24,8 @@ import { IndexEditor } from "../../schema/index-editor";
 import { IntrospectingSchemaProvider } from "../../schema/introspection/introspecting-schema-provider";
 import { OptionallyQualifiedName } from "../../schema/name/optionally-qualified-name";
 import {
-  UnquotedIdentifierFolding,
   foldUnquotedIdentifier,
+  UnquotedIdentifierFolding,
 } from "../../schema/name/unquoted-identifier-folding";
 import { PrimaryKeyConstraint } from "../../schema/primary-key-constraint";
 import { PrimaryKeyConstraintEditor } from "../../schema/primary-key-constraint-editor";

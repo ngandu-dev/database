@@ -1,6 +1,6 @@
 import type { AbstractPlatform } from "../../platforms/abstract-platform";
 import { InvalidIdentifier } from "../exception/invalid-identifier";
-import { UnquotedIdentifierFolding, foldUnquotedIdentifier } from "./unquoted-identifier-folding";
+import { foldUnquotedIdentifier, UnquotedIdentifierFolding } from "./unquoted-identifier-folding";
 
 export class Identifier {
   private constructor(

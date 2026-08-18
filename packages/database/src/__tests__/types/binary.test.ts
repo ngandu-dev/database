@@ -33,18 +33,12 @@ describe("BinaryType parity", () => {
     expect(Buffer.from(phpValue as Uint8Array).toString("utf8")).toBe("binary string");
   });
 
-  it.each([
-    false,
-    true,
-    0,
-    1,
-    -1,
-    0.0,
-    1.1,
-    -1.1,
-  ])("throws conversion exception on invalid database value: %p", (value) => {
-    expect(() => new BinaryType().convertToNodeValue(value, new MySQLPlatform())).toThrow(
-      ConversionException,
-    );
-  });
+  it.each([false, true, 0, 1, -1, 0.0, 1.1, -1.1])(
+    "throws conversion exception on invalid database value: %p",
+    (value) => {
+      expect(() => new BinaryType().convertToNodeValue(value, new MySQLPlatform())).toThrow(
+        ConversionException,
+      );
+    },
+  );
 });

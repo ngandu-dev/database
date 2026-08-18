@@ -1,4 +1,17 @@
-# @devscast/queryzen
+# @ngandu-dev/query-builder
+
+## 2.0.0 - Unreleased
+
+### Changed
+
+- Renamed the package from `@devscast/queryzen` to `@ngandu-dev/query-builder`.
+- Adopted the more complete query-builder behavior previously maintained in Datazen.
+- Added a small connection contract so database execution remains optional and dependency direction stays one-way.
+- Standardized the build, quality, test, documentation, and release configuration.
+
+### Removed
+
+- Removed support for the former package coordinate and legacy named-parameter argument order.
 
 ## 1.1.3
 

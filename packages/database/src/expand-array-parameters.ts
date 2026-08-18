@@ -2,9 +2,9 @@ import { ArrayParameterType } from "./array-parameter-type";
 import { MissingNamedParameter } from "./array-parameters/exception/missing-named-parameter";
 import { MissingPositionalParameter } from "./array-parameters/exception/missing-positional-parameter";
 import type {
+  QueryParameters,
   QueryParameterType,
   QueryParameterTypes,
-  QueryParameters,
   QueryScalarParameterType,
 } from "./query";
 import type { Visitor } from "./sql/parser/visitor";

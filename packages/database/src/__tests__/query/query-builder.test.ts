@@ -13,7 +13,7 @@ import type { Connection as DriverConnection } from "../../driver/connection";
 import { DriverException } from "../../exception/driver-exception";
 import { ParameterType } from "../../parameter-type";
 import { MySQLPlatform } from "../../platforms/mysql-platform";
-import type { QueryParameterTypes, QueryParameters } from "../../query";
+import type { QueryParameters, QueryParameterTypes } from "../../query";
 import { NonUniqueAlias } from "../../query/exception/non-unique-alias";
 import { UnknownAlias } from "../../query/exception/unknown-alias";
 import { CompositeExpression } from "../../query/expression/composite-expression";
@@ -578,14 +578,14 @@ describe("QueryBuilder", () => {
     expect(qb.toString()).toBe("INSERT INTO users (foo, bar) VALUES(?, ?)");
   });
 
-  it.each([
-    { maxResults: 10 },
-    { maxResults: null },
-  ])("should set and get maxResults: $maxResults", ({ maxResults }) => {
-    const qb = createQueryBuilder();
-    qb.setMaxResults(maxResults);
-    expect(qb.getMaxResults()).toBe(maxResults);
-  });
+  it.each([{ maxResults: 10 }, { maxResults: null }])(
+    "should set and get maxResults: $maxResults",
+    ({ maxResults }) => {
+      const qb = createQueryBuilder();
+      qb.setMaxResults(maxResults);
+      expect(qb.getMaxResults()).toBe(maxResults);
+    },
+  );
 
   it("should set and get firstResult", () => {
     const qb = createQueryBuilder();

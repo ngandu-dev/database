@@ -85,14 +85,13 @@ describe("Schema/IndexEditor (Doctrine parity)", () => {
     });
   });
 
-  it.each([
-    ["fulltext"],
-    ["spatial"],
-    ["clustered"],
-  ])("preserves flag %s through edit()", (flag) => {
-    const index1 = new Index("idx_test", ["test"], false, false, [flag]);
-    const index2 = index1.edit().create();
+  it.each([["fulltext"], ["spatial"], ["clustered"]])(
+    "preserves flag %s through edit()",
+    (flag) => {
+      const index1 = new Index("idx_test", ["test"], false, false, [flag]);
+      const index2 = index1.edit().create();
 
-    expect(index2.getFlags()).toEqual([flag]);
-  });
+      expect(index2.getFlags()).toEqual([flag]);
+    },
+  );
 });

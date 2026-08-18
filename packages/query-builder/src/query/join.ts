@@ -6,15 +6,15 @@ export class Join {
     public readonly condition: string | null,
   ) {}
 
-  static inner(table: string, alias: string, condition: string | null): Join {
+  public static inner(table: string, alias: string, condition: string | null): Join {
     return new Join("INNER", table, alias, condition);
   }
 
-  static left(table: string, alias: string, condition: string | null): Join {
+  public static left(table: string, alias: string, condition: string | null): Join {
     return new Join("LEFT", table, alias, condition);
   }
 
-  static right(table: string, alias: string, condition: string | null): Join {
+  public static right(table: string, alias: string, condition: string | null): Join {
     return new Join("RIGHT", table, alias, condition);
   }
 }

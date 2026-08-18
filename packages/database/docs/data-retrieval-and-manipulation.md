@@ -12,7 +12,7 @@ Doctrine/Datazen async note: query execution is async in this Node port, but
 created.
 
 ```ts
-import { DriverManager } from "@devscast/datazen";
+import { DriverManager } from "@ngandu-dev/database";
 
 const conn = DriverManager.getConnection({
   driver: "mysql2",
@@ -128,13 +128,13 @@ Binding Types
 You can bind:
 
 - `ParameterType` values (scalar DB binding types)
-- DataZen type names / type instances (`@devscast/datazen/types`) for value conversion
+- DataZen type names / type instances (`@ngandu-dev/database/types`) for value conversion
 - `ArrayParameterType` values for list expansion
 
 Type conversion for scalar values is applied by `Connection` before execution.
 
 ```ts
-import { ParameterType } from "@devscast/datazen";
+import { ParameterType } from "@ngandu-dev/database";
 
 await conn.executeQuery(
   "SELECT * FROM articles WHERE id = :id",
@@ -157,7 +157,7 @@ Supported list binding types:
 - `ArrayParameterType.BINARY`
 
 ```ts
-import { ArrayParameterType } from "@devscast/datazen";
+import { ArrayParameterType } from "@ngandu-dev/database";
 
 const result = await conn.executeQuery(
   "SELECT * FROM articles WHERE id IN (:ids)",

@@ -1,13 +1,16 @@
 import { ArrayParameterType } from "../array-parameter-type";
+import { DefaultQueryBuilderConnection } from "../default-query-builder-connection";
 import { ParameterType } from "../parameter-type";
-import { AbstractPlatform } from "../platforms/abstract-platform";
-import { MySQLPlatform } from "../platforms/mysql-platform";
 import { CommonTableExpression } from "../query/common-table-expression";
+import type { QueryBuilderConnection } from "../query-builder-connection";
+import type { QueryParameters, QueryParameterTypes } from "../query-parameter";
+import type { QueryResult } from "../query-result";
 import { NonUniqueAlias } from "./exception/non-unique-alias";
 import { UnknownAlias } from "./exception/unknown-alias";
 import { CompositeExpression } from "./expression/composite-expression";
 import { ExpressionBuilder } from "./expression/expression-builder";
-import { ConflictResolutionMode, ForUpdate } from "./for-update";
+import { ForUpdate } from "./for-update";
+import { ConflictResolutionMode } from "./for-update/conflict-resolution-mode";
 import { From } from "./from";
 import { Join } from "./join";
 import { Limit } from "./limit";
@@ -18,6 +21,7 @@ import { Union } from "./union";
 import { UnionQuery } from "./union-query";
 import { UnionType } from "./union-type";
 
+type AssociativeRow = Record<string, unknown>;
 type ParamType = string | ParameterType | ArrayParameterType;
 
 export enum PlaceHolder {
@@ -25,20 +29,10 @@ export enum PlaceHolder {
   POSITIONAL = "positional",
 }
 
-/**
- * QueryBuilder class is responsible to dynamically create SQL queries.
- *
- * Important: Verify that every feature you use will work with your database vendor.
- * SQL Query Builder does not attempt to validate the generated SQL at all.
- *
- * The query builder does no validation whatsoever if certain features even work with the
- * underlying database vendor. Limit queries and joins are NOT applied to UPDATE and DELETE statements
- * even if some vendors such as MySQL support it.
- */
 export class QueryBuilder {
   private sql: string | null = null;
-  private params: Record<string | number, any> = [];
-  private types: Record<string | number, any> = {};
+  private params: QueryParameters = [];
+  private types: QueryParameterTypes = [];
   private type: QueryType = QueryType.SELECT;
   private boundCounter: number = 0;
   private firstResult: number = 0;
@@ -59,22 +53,62 @@ export class QueryBuilder {
   private _forUpdate: ForUpdate | null = null;
   private _values: Record<string, any> = {};
 
-  constructor(private readonly platform: AbstractPlatform = new MySQLPlatform()) {}
+  constructor(
+    private readonly connection: QueryBuilderConnection = new DefaultQueryBuilderConnection(),
+  ) {}
 
-  /**
-   * Gets an ExpressionBuilder used for object-oriented construction of query expressions.
-   * This producer method is intended for convenient inline usage.
-   *
-   * For more complex expression construction, consider storing the expression
-   * builder object in a local variable.
-   */
   public expr(): ExpressionBuilder {
-    return new ExpressionBuilder(this.platform);
+    return this.connection.createExpressionBuilder();
   }
 
-  /**
-   * Gets the complete SQL string formed by the current specifications of this QueryBuilder.
-   */
+  public sub(): QueryBuilder {
+    return this.connection.createQueryBuilder();
+  }
+
+  public executeQuery<T extends AssociativeRow = AssociativeRow>(): Promise<QueryResult<T>> {
+    return this.connection.executeQuery<T>(this.getSQL(), this.params, this.types);
+  }
+
+  public executeStatement(): Promise<number> {
+    return this.connection.executeStatement(this.getSQL(), this.params, this.types);
+  }
+
+  public async fetchAssociative<T extends AssociativeRow = AssociativeRow>(): Promise<
+    T | undefined
+  > {
+    return (await this.executeQuery()).fetchAssociative<T>();
+  }
+
+  public async fetchNumeric<T extends unknown[] = unknown[]>(): Promise<T | undefined> {
+    return (await this.executeQuery()).fetchNumeric<T>();
+  }
+
+  public async fetchOne<T = unknown>(): Promise<T | undefined> {
+    return (await this.executeQuery()).fetchOne<T>();
+  }
+
+  public async fetchAllNumeric<T extends unknown[] = unknown[]>(): Promise<T[]> {
+    return (await this.executeQuery()).fetchAllNumeric<T>();
+  }
+
+  public async fetchAllAssociative<T extends AssociativeRow = AssociativeRow>(): Promise<T[]> {
+    return (await this.executeQuery()).fetchAllAssociative<T>();
+  }
+
+  public async fetchAllKeyValue<T = unknown>(): Promise<Record<string, T>> {
+    return (await this.executeQuery()).fetchAllKeyValue<T>();
+  }
+
+  public async fetchAllAssociativeIndexed<T extends AssociativeRow = AssociativeRow>(): Promise<
+    Record<string, T>
+  > {
+    return (await this.executeQuery()).fetchAllAssociativeIndexed<T>();
+  }
+
+  public async fetchFirstColumn<T = unknown>(): Promise<T[]> {
+    return (await this.executeQuery()).fetchFirstColumn<T>();
+  }
+
   public getSQL(): string {
     if (this.sql !== null) return this.sql;
 
@@ -97,64 +131,66 @@ export class QueryBuilder {
     }
   }
 
-  /**
-   * Sets a query parameter for the query being constructed.
-   */
   public setParameter(
     key: string | number,
     value: any,
     type: ParamType = ParameterType.STRING,
   ): this {
-    this.params[key] = value;
-    this.types[key] = type;
+    if (typeof key === "number") {
+      this.ensurePositionalParams()[key] = value;
+      this.ensurePositionalTypes()[key] = type;
+      return this;
+    }
+
+    this.ensureNamedParams()[key] = value;
+    this.ensureNamedTypes()[key] = type;
 
     return this;
   }
 
-  /**
-   * Sets a query parameter for the query being constructed.
-   */
-  public setParameters(
-    params: Record<string | number, any>,
-    types: Record<string | number, ParamType> = {},
-  ): this {
+  public setParameters(params: QueryParameters, types: QueryParameterTypes = []): this {
     this.params = params;
     this.types = types;
 
     return this;
   }
 
-  /**
-   * Gets all defined query parameters for the query being constructed indexed by parameter index or name.
-   */
-  public getParameters(): Record<string | number, any> {
+  public getParameters(): QueryParameters {
     return this.params;
   }
 
-  /**
-   * Gets a (previously set) query parameter of the query being constructed.
-   */
   public getParameter(key: string | number): any {
-    return this.params[key] ?? null;
+    if (Array.isArray(this.params)) {
+      if (typeof key !== "number") {
+        return null;
+      }
+
+      return this.params[key] ?? null;
+    }
+
+    return this.params[String(key)] ?? null;
   }
 
-  /**
-   * Gets all defined query parameter types for the query being constructed indexed by parameter index or name.
-   */
-  public getParameterTypes(): Record<string | number, ParamType> {
+  public getParameterTypes(): QueryParameterTypes {
+    if (Array.isArray(this.types) && this.types.length === 0) {
+      return {};
+    }
+
     return this.types;
   }
 
-  /**
-   * Gets a (previously set) query parameter type of the query being constructed.
-   */
   public getParameterType(key: string | number): ParamType {
-    return this.types[key] ?? ParameterType.STRING;
+    if (Array.isArray(this.types)) {
+      if (typeof key !== "number") {
+        return ParameterType.STRING;
+      }
+
+      return (this.types[key] as ParamType | undefined) ?? ParameterType.STRING;
+    }
+
+    return (this.types[String(key)] as ParamType | undefined) ?? ParameterType.STRING;
   }
 
-  /**
-   * Sets the position of the first result to retrieve (the "offset").
-   */
   public setFirstResult(firstResult: number): this {
     this.firstResult = firstResult;
     this.sql = null;
@@ -162,16 +198,10 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Gets the position of the first result the query object was set to retrieve (the "offset").
-   */
   public getFirstResult(): number {
     return this.firstResult;
   }
 
-  /**
-   * Sets the maximum number of results to retrieve (the "limit").
-   */
   public setMaxResults(maxResults: number | null): this {
     this.maxResults = maxResults;
     this.sql = null;
@@ -179,17 +209,10 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Gets the maximum number of results the query object was set to retrieve (the "limit").
-   * Returns NULL if all results will be returned.
-   */
   public getMaxResults(): number | null {
     return this.maxResults;
   }
 
-  /**
-   * Locks the queried rows for a subsequent update.
-   */
   public forUpdate(mode: ConflictResolutionMode = ConflictResolutionMode.ORDINARY): this {
     this._forUpdate = new ForUpdate(mode);
     this.sql = null;
@@ -197,10 +220,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Specifies union parts to be used to build a UNION query.
-   * Replaces any previously specified parts.
-   */
   public union(part: string | QueryBuilder): this {
     this.type = QueryType.UNION;
     this.unionParts = [new Union(part)];
@@ -209,9 +228,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Add parts to be used to build a UNION query.
-   */
   public addUnion(part: string | QueryBuilder, type: UnionType = UnionType.DISTINCT): this {
     this.type = QueryType.UNION;
     if (this.unionParts.length === 0) {
@@ -223,9 +239,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Add a Common Table Expression to be used for a select query.
-   */
   public with(name: string, part: string | QueryBuilder, columns: string[] | null = null): this {
     this.commonTableExpressions.push(new CommonTableExpression(name, part, columns));
     this.sql = null;
@@ -233,10 +246,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Specifies an item that is to be returned in the query result.
-   * Replaces any previously specified selections, if any.
-   */
   public select(...expressions: string[]): this {
     this.type = QueryType.SELECT;
     this._select = expressions;
@@ -245,9 +254,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Adds or removes DISTINCT to/from the query.
-   */
   public distinct(distinct = true): this {
     this._distinct = distinct;
     this.sql = null;
@@ -255,9 +261,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Adds an item that is to be returned in the query result.
-   */
   public addSelect(expression: string, ...expressions: string[]): this {
     this.type = QueryType.SELECT;
     this._select.push(expression, ...expressions);
@@ -266,10 +269,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Turns the query being built into a bulk delete query that ranges over
-   * a certain table.
-   */
   public delete(table: string): this {
     this.type = QueryType.DELETE;
     this.table = table;
@@ -278,10 +277,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Turns the query being built into a bulk update query that ranges over
-   * a certain table
-   */
   public update(table: string): this {
     this.type = QueryType.UPDATE;
     this.table = table;
@@ -290,10 +285,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Turns the query being built into an insert query that inserts into
-   * a certain table
-   */
   public insert(table: string): this {
     this.type = QueryType.INSERT;
     this.table = table;
@@ -302,13 +293,9 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Turns the query being built into an insert query that inserts into
-   * a certain table with the given data record.
-   */
   public insertWith(
     table: string,
-    data: Record<string, any>,
+    data: AssociativeRow,
     placeHolder: PlaceHolder = PlaceHolder.POSITIONAL,
   ): this {
     if (!data || Object.keys(data).length === 0) {
@@ -323,7 +310,7 @@ export class QueryBuilder {
       const raw = data[column];
       const value =
         placeHolder === PlaceHolder.NAMED
-          ? this.createNamedParameter(raw, column, ParameterType.STRING)
+          ? this.createNamedParameter(raw, ParameterType.STRING, column)
           : this.createPositionalParameter(raw, ParameterType.STRING);
 
       this.setValue(column, value);
@@ -332,13 +319,9 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Turns the query being built into an update query that updates
-   * a certain table with the given data record.
-   */
   public updateWith(
     table: string,
-    data: Record<string, any>,
+    data: AssociativeRow,
     placeHolder: PlaceHolder = PlaceHolder.POSITIONAL,
   ): this {
     if (!data || Object.keys(data).length === 0) {
@@ -353,7 +336,7 @@ export class QueryBuilder {
       const raw = data[column];
       const value =
         placeHolder === PlaceHolder.NAMED
-          ? this.createNamedParameter(raw, column, ParameterType.STRING)
+          ? this.createNamedParameter(raw, ParameterType.STRING, column)
           : this.createPositionalParameter(raw, ParameterType.STRING);
 
       this.set(column, value);
@@ -362,10 +345,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Creates and adds a query root corresponding to the table identified by the
-   * given alias, forming a cartesian product with any existing query roots.
-   */
   public from(table: string, alias: string | null = null): this {
     this._from.push(new From(table, alias));
     this.sql = null;
@@ -373,9 +352,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Creates and adds a join to the query.
-   */
   public join(
     fromAlias: string,
     join: string,
@@ -385,9 +361,6 @@ export class QueryBuilder {
     return this.innerJoin(fromAlias, join, alias, condition);
   }
 
-  /**
-   * Creates and adds a join to the query.
-   */
   public innerJoin(
     fromAlias: string,
     join: string,
@@ -401,9 +374,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Creates and adds a left join to the query.
-   */
   public leftJoin(
     fromAlias: string,
     join: string,
@@ -417,9 +387,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Creates and adds a right join to the query.
-   */
   public rightJoin(
     fromAlias: string,
     join: string,
@@ -433,9 +400,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Sets a new value for a column in a bulk update query.
-   */
   public set(key: string, value: string): this {
     this._set.push(`${key} = ${value}`);
     this.sql = null;
@@ -443,10 +407,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Specifies one or more restrictions to the query result.
-   * Replaces any previously specified restrictions, if any.
-   */
   public where(
     predicate: string | CompositeExpression,
     ...predicates: (string | CompositeExpression)[]
@@ -457,10 +417,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Adds one or more restrictions to the query results, forming a logical
-   * conjunction with any previously specified restrictions.
-   */
   public andWhere(
     predicate: string | CompositeExpression,
     ...predicates: (string | CompositeExpression)[]
@@ -476,10 +432,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Adds one or more restrictions to the query results, forming a logical
-   * disjunction with any previously specified restrictions.
-   */
   public orWhere(
     predicate: string | CompositeExpression,
     ...predicates: (string | CompositeExpression)[]
@@ -495,10 +447,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Specifies one or more grouping expressions over the results of the query.
-   * Replaces any previously specified groupings, if any.
-   */
   public groupBy(expression: string, ...expressions: string[]): this {
     this._groupBy = [expression, ...expressions];
     this.sql = null;
@@ -506,9 +454,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Adds one or more grouping expressions to the query.
-   */
   public addGroupBy(expression: string, ...expressions: string[]): this {
     this._groupBy.push(expression, ...expressions);
     this.sql = null;
@@ -516,28 +461,17 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Sets a value for a column in an insert query.
-   */
   public setValue(column: string, value: string): this {
     this._values[column] = value;
     return this;
   }
 
-  /**
-   * Specifies values for an insert query indexed by column names.
-   * Replaces any previous values, if any.
-   */
   public values(values: Record<string, any>): this {
     this._values = values;
     this.sql = null;
     return this;
   }
 
-  /**
-   * Specifies a restriction over the groups of the query.
-   * Replaces any previous having restrictions, if any.
-   */
   public having(
     predicate: string | CompositeExpression,
     ...predicates: (string | CompositeExpression)[]
@@ -547,10 +481,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Adds a restriction over the groups of the query, forming a logical
-   * conjunction with any existing having restrictions.
-   */
   public andHaving(
     predicate: string | CompositeExpression,
     ...predicates: (string | CompositeExpression)[]
@@ -565,10 +495,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Adds a restriction over the groups of the query, forming a logical
-   * disjunction with any existing having restrictions.
-   */
   public orHaving(
     predicate: string | CompositeExpression,
     ...predicates: (string | CompositeExpression)[]
@@ -583,10 +509,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Specifies an ordering for the query results.
-   * Replaces any previously specified orderings, if any.
-   */
   public orderBy(sort: string, order?: string): this {
     const clause = order ? `${sort} ${order}` : sort;
     this._orderBy = [clause];
@@ -595,9 +517,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Adds an ordering to the query results.
-   */
   public addOrderBy(sort: string, order?: string): this {
     const clause = order ? `${sort} ${order}` : sort;
     this._orderBy.push(clause);
@@ -606,9 +525,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Resets the WHERE conditions for the query.
-   */
   public resetWhere(): this {
     this._where = null;
     this.sql = null;
@@ -616,9 +532,6 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Resets the grouping for the query.
-   */
   public resetGroupBy(): this {
     this._groupBy = [];
     this.sql = null;
@@ -626,49 +539,26 @@ export class QueryBuilder {
     return this;
   }
 
-  /**
-   * Resets the HAVING conditions for the query.
-   */
   public resetHaving(): this {
     this._having = null;
     this.sql = null;
     return this;
   }
 
-  /**
-   * Resets the ordering for the query.
-   */
   public resetOrderBy(): this {
     this._orderBy = [];
     this.sql = null;
     return this;
   }
 
-  /**
-   * Gets a string representation of this QueryBuilder which corresponds to
-   * the final SQL query being constructed.
-   */
   public toString(): string {
     return this.getSQL();
   }
 
-  /**
-   * Creates a new named parameter and bind the value $value to it.
-   *
-   * This method provides a shortcut for {@see Statement::bindValue()}
-   * when using prepared statements.
-   *
-   * The parameter $value specifies the value that you want to bind. If
-   * $placeholder is not provided createNamedParameter() will automatically
-   * create a placeholder for you. An automatic placeholder will be of the
-   * name ':dcValue1', ':dcValue2' etc.
-   *
-   * @link http://www.zetacomponents.org
-   */
   public createNamedParameter(
-    value: any,
-    placeHolder: string | null = null,
+    value: unknown,
     type: ParamType = ParameterType.STRING,
+    placeHolder: string | null = null,
   ): string {
     if (placeHolder === null) {
       this.boundCounter++;
@@ -682,24 +572,13 @@ export class QueryBuilder {
     return placeHolder;
   }
 
-  /**
-   * Creates a new positional parameter and bind the given value to it.
-   *
-   * Attention: If you are using positional parameters with the query builder you have
-   * to be very careful to bind all parameters in the order they appear in the SQL
-   * statement , otherwise they get bound in the wrong order which can lead to serious
-   * bugs in your code.
-   */
-  public createPositionalParameter(value: any, type: ParamType = ParameterType.STRING): string {
+  public createPositionalParameter(value: unknown, type: ParamType = ParameterType.STRING): string {
     this.setParameter(this.boundCounter, value, type);
     this.boundCounter++;
 
     return "?";
   }
 
-  /**
-   * Creates a CompositeExpression from one or more predicates combined by the AND logic.
-   */
   private createPredicate(
     predicate: string | CompositeExpression,
     ...predicates: (string | CompositeExpression)[]
@@ -711,9 +590,6 @@ export class QueryBuilder {
     return new CompositeExpression("AND", predicate, ...predicates);
   }
 
-  /**
-   * Appends the given predicates combined by the given type of logic to the current predicate.
-   */
   private appendToPredicate(
     currentPredicate: string | CompositeExpression | null,
     type: "AND" | "OR",
@@ -751,38 +627,37 @@ export class QueryBuilder {
       throw new QueryException("No SELECT expressions given. Please use select() or addSelect().");
     }
 
+    const databasePlatform = this.connection.getDatabasePlatform();
     const selectParts: string[] = [];
-    if (this.commonTableExpressions.length > 0 && this.platform) {
+    if (this.commonTableExpressions.length > 0) {
       const [expression, ...rest] = this.commonTableExpressions;
       if (!expression) {
         throw new Error("CommonTableExpression cannot be undefined");
       }
       selectParts.push(
-        this.platform
+        databasePlatform
           .createWithSQLBuilder()
           .buildSQL(expression, ...rest.filter((e) => e !== undefined)),
       );
     }
 
-    if (this.platform) {
-      selectParts.push(
-        this.platform
-          .createSelectSQLBuilder()
-          .buildSQL(
-            new SelectQuery(
-              this._distinct,
-              this._select,
-              this.getFromClauses(),
-              this._where !== null ? this._where.toString() : null,
-              this._groupBy,
-              this._having !== null ? this._having.toString() : null,
-              this._orderBy,
-              new Limit(this.maxResults, this.firstResult),
-              this._forUpdate,
-            ),
+    selectParts.push(
+      databasePlatform
+        .createSelectSQLBuilder()
+        .buildSQL(
+          new SelectQuery(
+            this._distinct,
+            this._select,
+            this.getFromClauses(),
+            this._where !== null ? this._where.toString() : null,
+            this._groupBy,
+            this._having !== null ? this._having.toString() : null,
+            this._orderBy,
+            new Limit(this.maxResults, this.firstResult),
+            this._forUpdate,
           ),
-      );
-    }
+        ),
+    );
 
     return selectParts.join(" ");
   }
@@ -853,7 +728,8 @@ export class QueryBuilder {
       );
     }
 
-    return this.platform
+    return this.connection
+      .getDatabasePlatform()
       .createUnionSQLBuilder()
       .buildSQL(
         new UnionQuery(
@@ -890,5 +766,37 @@ export class QueryBuilder {
     }
 
     return sql;
+  }
+
+  private ensurePositionalParams(): unknown[] {
+    if (!Array.isArray(this.params)) {
+      this.params = [];
+    }
+
+    return this.params;
+  }
+
+  private ensurePositionalTypes(): ParamType[] {
+    if (!Array.isArray(this.types)) {
+      this.types = [];
+    }
+
+    return this.types as ParamType[];
+  }
+
+  private ensureNamedParams(): AssociativeRow {
+    if (Array.isArray(this.params)) {
+      this.params = {};
+    }
+
+    return this.params;
+  }
+
+  private ensureNamedTypes(): Record<string, ParamType> {
+    if (Array.isArray(this.types)) {
+      this.types = {};
+    }
+
+    return this.types as Record<string, ParamType>;
   }
 }

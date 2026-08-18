@@ -17,7 +17,7 @@ Type Registry and Flyweights
 Types are resolved through `Type` static APIs:
 
 ```ts
-import { Type, Types } from "@devscast/datazen/types";
+import { Type, Types } from "@ngandu-dev/database/types";
 
 const integerType = Type.getType(Types.INTEGER);
 ```
@@ -38,7 +38,7 @@ The registry enforces invariants:
 Built-in Types
 --------------
 
-Built-ins are registered from the `@devscast/datazen/types` namespace and available via `Types` constants.
+Built-ins are registered from the `@ngandu-dev/database/types` namespace and available via `Types` constants.
 
 Numeric:
 
@@ -106,7 +106,7 @@ Using Types in Query Execution
 You can pass type names, `Type` instances, or low-level `ParameterType` values.
 
 ```ts
-import { DriverManager, ParameterType } from "@devscast/datazen";
+import { DriverManager, ParameterType } from "@ngandu-dev/database";
 
 const conn = DriverManager.getConnection({ driver: "mysql2", pool });
 
@@ -147,8 +147,8 @@ Custom Types
 Create a custom type by extending `Type` and registering it.
 
 ```ts
-import { AbstractPlatform } from "@devscast/datazen/platforms";
-import { Type } from "@devscast/datazen/types";
+import { AbstractPlatform } from "@ngandu-dev/database/platforms";
+import { Type } from "@ngandu-dev/database/types";
 
 class MoneyType extends Type {
   public getSQLDeclaration(
@@ -188,7 +188,7 @@ platform.registerDatazenTypeMapping("mymoney", "money");
 Error Model
 -----------
 
-Type and conversion failures throw typed exceptions from `@devscast/datazen/types`,
+Type and conversion failures throw typed exceptions from `@ngandu-dev/database/types`,
 including:
 
 - `UnknownColumnType`
@@ -203,6 +203,6 @@ including:
 Scope Note
 ----------
 
-Schema support is available separately under `@devscast/datazen/schema`.
+Schema support is available separately under `@ngandu-dev/database/schema`.
 This page focuses on the runtime type system rather than schema
 reverse-engineering workflows.

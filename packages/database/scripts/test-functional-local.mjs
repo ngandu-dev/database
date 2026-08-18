@@ -54,7 +54,8 @@ async function runTarget(name, targetEnv, args) {
 
   const command = process.platform === "win32" ? (process.env.ComSpec ?? "cmd.exe") : "node";
   const nodeArgs = ["scripts/test-functional.mjs", ...args];
-  const commandArgs = process.platform === "win32" ? ["/d", "/s", "/c", "node", ...nodeArgs] : nodeArgs;
+  const commandArgs =
+    process.platform === "win32" ? ["/d", "/s", "/c", "node", ...nodeArgs] : nodeArgs;
 
   const code = await new Promise((resolve) => {
     const child = spawn(command, commandArgs, {

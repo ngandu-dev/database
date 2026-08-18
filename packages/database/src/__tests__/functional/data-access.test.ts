@@ -285,36 +285,34 @@ describe("Functional/DataAccessTest", () => {
     expect(result.fetchAllNumeric()).toEqual([[100], [101], [102], [103], [104]]);
   });
 
-  it.each(trimExpressionCases)("trim expression (%j, %s, %j)", async ({
-    value,
-    mode,
-    char,
-    expected,
-  }) => {
-    const connection = functional.connection();
-    const sql =
-      "SELECT " +
-      connection.getDatabasePlatform().getTrimExpression(value, mode, char) +
-      " AS trimmed FROM fetch_table";
+  it.each(trimExpressionCases)(
+    "trim expression (%j, %s, %j)",
+    async ({ value, mode, char, expected }) => {
+      const connection = functional.connection();
+      const sql =
+        "SELECT " +
+        connection.getDatabasePlatform().getTrimExpression(value, mode, char) +
+        " AS trimmed FROM fetch_table";
 
-    const row = lowerCaseKeys(await connection.fetchAssociative(sql));
-    expect(row.trimmed).toBe(expected);
-  });
+      const row = lowerCaseKeys(await connection.fetchAssociative(sql));
+      expect(row.trimmed).toBe(expected);
+    },
+  );
 
   for (const dateCase of dateArithmeticCases) {
-    it.each(intervalModes)(`${dateCase.name} (%s interval mode)`, async ({
-      buildQuery,
-      bindParams,
-    }) => {
-      await assertDateExpression(
-        functional.connection(),
-        buildQuery,
-        bindParams,
-        dateCase.buildExpression,
-        dateCase.interval,
-        dateCase.expected,
-      );
-    });
+    it.each(intervalModes)(
+      `${dateCase.name} (%s interval mode)`,
+      async ({ buildQuery, bindParams }) => {
+        await assertDateExpression(
+          functional.connection(),
+          buildQuery,
+          bindParams,
+          dateCase.buildExpression,
+          dateCase.interval,
+          dateCase.expected,
+        );
+      },
+    );
   }
 
   it("sqlite date arithmetic with dynamic interval", async ({ skip }) => {
@@ -380,18 +378,16 @@ describe("Functional/DataAccessTest", () => {
     });
   });
 
-  it.each(substringExpressionCases)("substring expression (%s, %s, %s)", async ({
-    string,
-    start,
-    length,
-    expected,
-  }) => {
-    const platform = functional.connection().getDatabasePlatform();
-    const query = platform.getDummySelectSQL(
-      platform.getSubstringExpression(string, start, length),
-    );
-    expect(await functional.connection().fetchOne(query)).toBe(expected);
-  });
+  it.each(substringExpressionCases)(
+    "substring expression (%s, %s, %s)",
+    async ({ string, start, length, expected }) => {
+      const platform = functional.connection().getDatabasePlatform();
+      const query = platform.getDummySelectSQL(
+        platform.getSubstringExpression(string, start, length),
+      );
+      expect(await functional.connection().fetchOne(query)).toBe(expected);
+    },
+  );
 
   it("quote SQL injection", async () => {
     const quoted = await functional.connection().quote("bar' OR '1'='1");

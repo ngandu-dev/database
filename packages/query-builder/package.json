@@ -1,78 +1,65 @@
 {
-  "name": "@devscast/queryzen",
-  "version": "1.1.4",
+  "name": "@ngandu-dev/query-builder",
+  "version": "2.0.0",
+  "description": "A composable SQL query builder for TypeScript and Node.js.",
+  "license": "MIT",
+  "author": "Bernard Ngandu <bernard@ngandu.dev>",
+  "type": "module",
+  "sideEffects": false,
   "source": "./src/index.ts",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "module": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsup --minify",
     "dev": "tsup --watch",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "============= HUSKY =============": "",
-    "prepare": "husky",
-    "commit": "cz",
-    "=========== CODE STYLE ============": "",
-    "lint": "biome check && biome lint",
-    "format": "biome format --write && biome check --write && biome lint --write",
+    "format": "biome check --write src",
+    "lint": "biome lint src",
     "typecheck": "tsc --noEmit",
-    "=========== NPM PUBLISH ==============": "",
-    "release": "npm run build && npm publish --access public",
-    "version": "changeset version"
-  },
-  "lint-staged": {
-    "*.ts": [
-      "prettier --write",
-      "eslint --fix"
-    ]
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
-  },
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "check:package": "publint && attw --pack . --profile node16"
   },
   "keywords": [
     "sql",
-    "mysql",
     "query",
     "builder",
-    "orm",
+    "database",
     "dbal"
   ],
-  "author": "Bernard Ngandu <bernard@devscast.tech>",
-  "license": "MIT",
-  "description": "QueryZen : TypeScript SQL Query Builder inspired by Doctrine DBAL",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/devscast/queryzen-ts.git"
+    "url": "git+https://github.com/ngandu-dev/database.git",
+    "directory": "packages/query-builder"
   },
   "bugs": {
-    "url": "https://github.com/devscast/queryzen-ts/issues"
+    "url": "https://github.com/ngandu-dev/database/issues"
   },
-  "homepage": "https://github.com/devscast/queryzen-ts#readme",
-  "devDependencies": {
-    "@biomejs/biome": "^2.3.15",
-    "@changesets/cli": "^2.29.8",
-    "@commitlint/cli": "^19.8.1",
-    "@commitlint/config-conventional": "^19.8.1",
-    "@types/node": "^24.10.13",
-    "@typescript-eslint/eslint-plugin": "^8.55.0",
-    "@typescript-eslint/parser": "^8.55.0",
-    "commitizen": "^4.3.1",
-    "cz-conventional-changelog": "^3.3.0",
-    "husky": "^9.1.7",
-    "tsup": "^8.5.1",
-    "typescript": "^5.9.3",
-    "vitest": "^3.2.4"
+  "homepage": "https://github.com/ngandu-dev/database/tree/main/packages/query-builder#readme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

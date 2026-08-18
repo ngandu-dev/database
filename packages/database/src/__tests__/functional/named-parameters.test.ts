@@ -35,14 +35,15 @@ describe("Functional/NamedParametersTest", () => {
     await connection.insert("ddc1372_foobar", { id: 6, foo: 2, bar: 2 });
   });
 
-  it.each(
-    ticketProvider(),
-  )("expands named parameters and array types correctly (%s)", async (query, params, types, expected) => {
-    const rows = await functional.connection().fetchAllAssociative(query, params, types);
-    const normalized = rows.map(normalizeRowForDoctrineStyleComparison);
+  it.each(ticketProvider())(
+    "expands named parameters and array types correctly (%s)",
+    async (query, params, types, expected) => {
+      const rows = await functional.connection().fetchAllAssociative(query, params, types);
+      const normalized = rows.map(normalizeRowForDoctrineStyleComparison);
 
-    expect(normalized).toEqual(expected);
-  });
+      expect(normalized).toEqual(expected);
+    },
+  );
 });
 
 function ticketProvider(): Array<

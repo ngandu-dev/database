@@ -350,14 +350,14 @@ describe("QueryBuilder", () => {
     expect(qb.toString()).toBe("INSERT INTO users (foo, bar) VALUES(?, ?)");
   });
 
-  it.each([
-    { maxResults: 10 },
-    { maxResults: null },
-  ])("should set and get maxResults: $maxResults", ({ maxResults }) => {
-    const qb = new QueryBuilder();
-    qb.setMaxResults(maxResults);
-    expect(qb.getMaxResults()).toBe(maxResults);
-  });
+  it.each([{ maxResults: 10 }, { maxResults: null }])(
+    "should set and get maxResults: $maxResults",
+    ({ maxResults }) => {
+      const qb = new QueryBuilder();
+      qb.setMaxResults(maxResults);
+      expect(qb.getMaxResults()).toBe(maxResults);
+    },
+  );
 
   it("should set and get firstResult", () => {
     const qb = new QueryBuilder();
@@ -437,7 +437,7 @@ describe("QueryBuilder", () => {
     const qb = new QueryBuilder();
     qb.select("u.*")
       .from("users", "u")
-      .where(qb.expr().eq("u.name", qb.createNamedParameter(10, "name", ParameterType.INTEGER)));
+      .where(qb.expr().eq("u.name", qb.createNamedParameter(10, ParameterType.INTEGER, "name")));
 
     expect(qb.toString()).toBe("SELECT u.* FROM users u WHERE u.name = :name");
     expect(qb.getParameter("name")).toBe(10);
@@ -459,7 +459,7 @@ describe("QueryBuilder", () => {
     const qb = new QueryBuilder();
     qb.select("u.*")
       .from("users", "u")
-      .where(qb.expr().eq("u.name", qb.createNamedParameter(10, ":test", ParameterType.INTEGER)));
+      .where(qb.expr().eq("u.name", qb.createNamedParameter(10, ParameterType.INTEGER, ":test")));
 
     expect(qb.toString()).toBe("SELECT u.* FROM users u WHERE u.name = :test");
     expect(qb.getParameter("test")).toBe(10);

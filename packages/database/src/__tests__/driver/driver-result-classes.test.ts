@@ -40,26 +40,27 @@ describe("driver result classes", () => {
     ).toBe("name");
   });
 
-  it.each(
-    driverResultCtors,
-  )("%s result supports fetchAll helpers and free()", (_name, ResultCtor) => {
-    const result = new ResultCtor(
-      [
-        { id: 1, name: "A" },
-        { id: 2, name: "B" },
-      ],
-      ["id", "name"],
-      "3",
-    );
+  it.each(driverResultCtors)(
+    "%s result supports fetchAll helpers and free()",
+    (_name, ResultCtor) => {
+      const result = new ResultCtor(
+        [
+          { id: 1, name: "A" },
+          { id: 2, name: "B" },
+        ],
+        ["id", "name"],
+        "3",
+      );
 
-    expect(result.fetchAllNumeric<[number, string]>()).toEqual([
-      [1, "A"],
-      [2, "B"],
-    ]);
-    expect(result.rowCount()).toBe("3");
+      expect(result.fetchAllNumeric<[number, string]>()).toEqual([
+        [1, "A"],
+        [2, "B"],
+      ]);
+      expect(result.rowCount()).toBe("3");
 
-    result.free();
-    expect(result.fetchFirstColumn()).toEqual([]);
-    expect(result.rowCount()).toBe("3");
-  });
+      result.free();
+      expect(result.fetchFirstColumn()).toEqual([]);
+      expect(result.rowCount()).toBe("3");
+    },
+  );
 });

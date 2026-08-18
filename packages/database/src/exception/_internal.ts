@@ -1,4 +1,4 @@
-const DBAL_EXCEPTION_MARKER = Symbol.for("@devscast/datazen.exception");
+const DBAL_EXCEPTION_MARKER = Symbol.for("@ngandu-dev/database.exception");
 
 type MarkedException = Error & {
   [DBAL_EXCEPTION_MARKER]?: true;

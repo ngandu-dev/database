@@ -4,15 +4,15 @@ export class Limit {
     public readonly firstResult: number = 0,
   ) {}
 
-  isDefined(): boolean {
+  public isDefined(): boolean {
     return this.maxResults !== null || this.firstResult !== 0;
   }
 
-  getMaxResults(): number | null {
+  public getMaxResults(): number | null {
     return this.maxResults;
   }
 
-  getFirstResult(): number {
+  public getFirstResult(): number {
     return this.firstResult;
   }
 }

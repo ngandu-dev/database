@@ -295,60 +295,54 @@ describe("Table (Doctrine TableTest parity, unified scope)", () => {
     "covers Doctrine deprecation-only cases for dropping columns with constraints and ambiguous name references (PHP deprecation harness specific)",
   );
 
-  it.each([
-    "foo",
-    "FOO",
-    "`foo`",
-    "`FOO`",
-    '"foo"',
-    '"FOO"',
-    "[foo]",
-    "[FOO]",
-  ])("normalizes asset names across columns/indexes/foreign keys for %s (Doctrine TableTest parity)", (assetName) => {
-    const table = new Table("test");
+  it.each(["foo", "FOO", "`foo`", "`FOO`", '"foo"', '"FOO"', "[foo]", "[FOO]"])(
+    "normalizes asset names across columns/indexes/foreign keys for %s (Doctrine TableTest parity)",
+    (assetName) => {
+      const table = new Table("test");
 
-    table.addColumn(assetName, Types.INTEGER);
-    table.addIndex([assetName], assetName);
-    table.addForeignKeyConstraint("test", [assetName], [assetName], {}, assetName);
+      table.addColumn(assetName, Types.INTEGER);
+      table.addIndex([assetName], assetName);
+      table.addForeignKeyConstraint("test", [assetName], [assetName], {}, assetName);
 
-    expect(table.hasColumn(assetName)).toBe(true);
-    expect(table.hasColumn("foo")).toBe(true);
+      expect(table.hasColumn(assetName)).toBe(true);
+      expect(table.hasColumn("foo")).toBe(true);
 
-    expect(table.hasIndex(assetName)).toBe(true);
-    expect(table.hasIndex("foo")).toBe(true);
+      expect(table.hasIndex(assetName)).toBe(true);
+      expect(table.hasIndex("foo")).toBe(true);
 
-    expect(table.hasForeignKey(assetName)).toBe(true);
-    expect(table.hasForeignKey("foo")).toBe(true);
+      expect(table.hasForeignKey(assetName)).toBe(true);
+      expect(table.hasForeignKey("foo")).toBe(true);
 
-    table.renameIndex(assetName, assetName);
-    expect(table.hasIndex(assetName)).toBe(true);
-    expect(table.hasIndex("foo")).toBe(true);
+      table.renameIndex(assetName, assetName);
+      expect(table.hasIndex(assetName)).toBe(true);
+      expect(table.hasIndex("foo")).toBe(true);
 
-    table.renameIndex(assetName, "foo");
-    expect(table.hasIndex(assetName)).toBe(true);
-    expect(table.hasIndex("foo")).toBe(true);
+      table.renameIndex(assetName, "foo");
+      expect(table.hasIndex(assetName)).toBe(true);
+      expect(table.hasIndex("foo")).toBe(true);
 
-    table.renameIndex("foo", assetName);
-    expect(table.hasIndex(assetName)).toBe(true);
-    expect(table.hasIndex("foo")).toBe(true);
+      table.renameIndex("foo", assetName);
+      expect(table.hasIndex(assetName)).toBe(true);
+      expect(table.hasIndex("foo")).toBe(true);
 
-    table.renameIndex(assetName, "bar");
-    expect(table.hasIndex(assetName)).toBe(false);
-    expect(table.hasIndex("foo")).toBe(false);
-    expect(table.hasIndex("bar")).toBe(true);
+      table.renameIndex(assetName, "bar");
+      expect(table.hasIndex(assetName)).toBe(false);
+      expect(table.hasIndex("foo")).toBe(false);
+      expect(table.hasIndex("bar")).toBe(true);
 
-    table.renameIndex("bar", assetName);
-    table.dropColumn(assetName);
-    table.dropIndex(assetName);
-    table.removeForeignKey(assetName);
+      table.renameIndex("bar", assetName);
+      table.dropColumn(assetName);
+      table.dropIndex(assetName);
+      table.removeForeignKey(assetName);
 
-    expect(table.hasColumn(assetName)).toBe(false);
-    expect(table.hasColumn("foo")).toBe(false);
-    expect(table.hasIndex(assetName)).toBe(false);
-    expect(table.hasIndex("foo")).toBe(false);
-    expect(table.hasForeignKey(assetName)).toBe(false);
-    expect(table.hasForeignKey("foo")).toBe(false);
-  });
+      expect(table.hasColumn(assetName)).toBe(false);
+      expect(table.hasColumn("foo")).toBe(false);
+      expect(table.hasIndex(assetName)).toBe(false);
+      expect(table.hasIndex("foo")).toBe(false);
+      expect(table.hasForeignKey(assetName)).toBe(false);
+      expect(table.hasForeignKey("foo")).toBe(false);
+    },
+  );
 
   it("renames indexes to Doctrine-compatible auto-generated names, including primary => primary", () => {
     const table = new Table("test");

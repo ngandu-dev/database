@@ -13,9 +13,9 @@ import { PrimaryKeyConstraint } from "../../../schema/primary-key-constraint";
 import { Schema } from "../../../schema/schema";
 import type { Table } from "../../../schema/table";
 import {
-  type FunctionalTarget,
   createFunctionalConnection,
   createFunctionalConnectionBundle,
+  type FunctionalTarget,
   resolveFunctionalTarget,
 } from "./functional-connection-factory";
 

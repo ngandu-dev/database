@@ -18,17 +18,19 @@ import { PostgreSQLPlatform } from "../../platforms/postgresql-platform";
 import { PostgreSQL120Platform } from "../../platforms/postgresql120-platform";
 
 describe("VersionAwarePlatformDriver", () => {
-  it.each(
-    mySqlVersionProvider(),
-  )("MySQL2Driver instantiates %p for version %p", async (version, expectedClass) => {
-    await assertDriverInstantiatesDatabasePlatform(new MySQL2Driver(), version, expectedClass);
-  });
+  it.each(mySqlVersionProvider())(
+    "MySQL2Driver instantiates %p for version %p",
+    async (version, expectedClass) => {
+      await assertDriverInstantiatesDatabasePlatform(new MySQL2Driver(), version, expectedClass);
+    },
+  );
 
-  it.each(
-    postgreSqlVersionProvider(),
-  )("PgDriver instantiates %p for version %p", async (version, expectedClass) => {
-    await assertDriverInstantiatesDatabasePlatform(new PgDriver(), version, expectedClass);
-  });
+  it.each(postgreSqlVersionProvider())(
+    "PgDriver instantiates %p for version %p",
+    async (version, expectedClass) => {
+      await assertDriverInstantiatesDatabasePlatform(new PgDriver(), version, expectedClass);
+    },
+  );
 
   it("throws on malformed MySQL/MariaDB versions", async () => {
     await expect(

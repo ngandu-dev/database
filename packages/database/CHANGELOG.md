@@ -1,4 +1,17 @@
-# @devscast/datazen
+# @ngandu-dev/database
+
+## 2.0.0 - Unreleased
+
+### Changed
+
+- Renamed the package from `@devscast/datazen` to `@ngandu-dev/database`.
+- Moved development into the `ngandu-dev/database` monorepo.
+- Replaced the bundled query-builder implementation with the shared `@ngandu-dev/query-builder` package.
+- Standardized the build, quality, test, documentation, and release configuration.
+
+### Removed
+
+- Removed support for the former package coordinate. Consumers must update their imports.
 
 # Final Doctrine Parity & Production-Ready Release
 
@@ -15,8 +28,8 @@
 
 # 1.1.1
 
-- Added package subpath entry points like `@devscast/datazen/logging` that resolve directly from published `dist/*` artifacts, including compatibility for older TypeScript `moduleResolution: "node"` projects without shipping extra root wrapper folders.
-- Fixed the bundled CommonJS MSSQL driver so requiring `@devscast/datazen` no longer fails with `createRequire()` receiving an undefined filename.
+- Added package subpath entry points like `@ngandu-dev/database/logging` that resolve directly from published `dist/*` artifacts, including compatibility for older TypeScript `moduleResolution: "node"` projects without shipping extra root wrapper folders.
+- Fixed the bundled CommonJS MSSQL driver so requiring `@ngandu-dev/database` no longer fails with `createRequire()` receiving an undefined filename.
 - Removed the internal `mssql` runtime module load and now bind MSSQL typed parameters less precisely via plain `request.input()` values.
 
 ## 1.1.0

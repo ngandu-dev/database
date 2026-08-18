@@ -48,7 +48,7 @@ Current scope includes:
 - `Connection`, `Statement`, `Result` abstractions
 - QueryBuilder and SQL parser support
 - Type conversion subsystem
-- Schema module foundations (`@devscast/datazen/schema`) with ongoing parity work
+- Schema module foundations (`@ngandu-dev/database/schema`) with ongoing parity work
 - Driver middleware (logging, portability)
 - DSN parsing
 
@@ -62,14 +62,14 @@ Getting Started
 Install package and runtime driver dependency:
 
 ```bash
-bun add @devscast/datazen mysql2
+bun add @ngandu-dev/database mysql2
 ```
 
 Example connection:
 
 ```ts
 import mysql from "mysql2/promise";
-import { DriverManager } from "@devscast/datazen";
+import { DriverManager } from "@ngandu-dev/database";
 
 const pool = mysql.createPool({
   database: "mydb",

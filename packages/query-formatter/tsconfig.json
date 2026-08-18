@@ -1,19 +1,8 @@
 {
-  "include": ["./src"],
-  "exclude": ["__tests__", "./src/__tests__", "./src/test.ts"],
+  "extends": "../../tsconfig.base.json",
+  "include": ["src"],
+  "exclude": ["src/__tests__"],
   "compilerOptions": {
-    "module": "esnext",
-    "target": "esnext",
-    "lib": ["esnext"],
-    "declaration": true,
-    "strict": true,
-    "moduleResolution": "bundler",
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "noUncheckedIndexedAccess": true,
-    "noEmit": true,
-    "outDir": "dist",
-    "rootDir": "src",
+    "outDir": "dist"
   }
 }

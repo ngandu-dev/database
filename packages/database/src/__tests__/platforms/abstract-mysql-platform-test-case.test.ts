@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  DummyMySQLPlatform,
   assertCommonPlatformSurface,
+  DummyMySQLPlatform,
 } from "./_helpers/platform-parity-scaffold";
 
 describe("Platforms AbstractMySQLPlatformTestCase parity scaffold", () => {

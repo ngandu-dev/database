@@ -1,6 +1,15 @@
+import { fileURLToPath } from "node:url";
+
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@ngandu-dev/query-builder": fileURLToPath(
+        new URL("../query-builder/src/index.ts", import.meta.url),
+      ),
+    },
+  },
   test: {
     globals: true,
     environment: "node",

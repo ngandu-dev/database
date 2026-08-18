@@ -24,47 +24,45 @@ describe("Functional/BooleanBindingTest", () => {
     );
   });
 
-  it.each([
-    true,
-    false,
-    null,
-  ] as const)("binds boolean parameter values via ParameterType::BOOLEAN (%s)", async (input) => {
-    const connection = functional.connection();
-    const qb = connection.createQueryBuilder();
+  it.each([true, false, null] as const)(
+    "binds boolean parameter values via ParameterType::BOOLEAN (%s)",
+    async (input) => {
+      const connection = functional.connection();
+      const qb = connection.createQueryBuilder();
 
-    const affected = await qb
-      .insert("boolean_test_table")
-      .values({ val: qb.createNamedParameter(input, ParameterType.BOOLEAN) })
-      .executeStatement();
+      const affected = await qb
+        .insert("boolean_test_table")
+        .values({ val: qb.createNamedParameter(input, ParameterType.BOOLEAN) })
+        .executeStatement();
 
-    expect(affected).toBe(1);
-    expect(
-      connection.convertToNodeValue(
-        await connection.fetchOne("SELECT val FROM boolean_test_table"),
-        Types.BOOLEAN,
-      ),
-    ).toBe(input);
-  });
+      expect(affected).toBe(1);
+      expect(
+        connection.convertToNodeValue(
+          await connection.fetchOne("SELECT val FROM boolean_test_table"),
+          Types.BOOLEAN,
+        ),
+      ).toBe(input);
+    },
+  );
 
-  it.each([
-    true,
-    false,
-    null,
-  ] as const)("binds boolean parameter values via Datazen type name (%s)", async (input) => {
-    const connection = functional.connection();
-    const qb = connection.createQueryBuilder();
+  it.each([true, false, null] as const)(
+    "binds boolean parameter values via Datazen type name (%s)",
+    async (input) => {
+      const connection = functional.connection();
+      const qb = connection.createQueryBuilder();
 
-    const affected = await qb
-      .insert("boolean_test_table")
-      .values({ val: qb.createNamedParameter(input, Types.BOOLEAN) })
-      .executeStatement();
+      const affected = await qb
+        .insert("boolean_test_table")
+        .values({ val: qb.createNamedParameter(input, Types.BOOLEAN) })
+        .executeStatement();
 
-    expect(affected).toBe(1);
-    expect(
-      connection.convertToNodeValue(
-        await connection.fetchOne("SELECT val FROM boolean_test_table"),
-        Types.BOOLEAN,
-      ),
-    ).toBe(input);
-  });
+      expect(affected).toBe(1);
+      expect(
+        connection.convertToNodeValue(
+          await connection.fetchOne("SELECT val FROM boolean_test_table"),
+          Types.BOOLEAN,
+        ),
+      ).toBe(input);
+    },
+  );
 });

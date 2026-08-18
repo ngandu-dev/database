@@ -1,14 +1,14 @@
 SQL Query Builder
 =================
 
-DataZen provides a Doctrine-inspired SQL Query Builder in `@devscast/datazen/query`.
+DataZen provides a Doctrine-inspired SQL Query Builder in `@ngandu-dev/database/query`.
 It builds SQL incrementally and executes through the `Connection` it belongs to.
 
 Doctrine/Datazen async note: builder mutation methods are synchronous, but
 execution/fetch helpers perform I/O and therefore return promises in this port.
 
 ```ts
-import { DriverManager } from "@devscast/datazen";
+import { DriverManager } from "@ngandu-dev/database";
 
 const conn = DriverManager.getConnection({ driver: "mysql2", pool });
 const qb = conn.createQueryBuilder();
@@ -183,7 +183,7 @@ UNION
 -----
 
 ```ts
-import { UnionType } from "@devscast/datazen/query";
+import { UnionType } from "@ngandu-dev/database/query";
 
 qb
   .union("SELECT 1 AS field")

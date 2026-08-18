@@ -1,6 +1,6 @@
 export class CompositeExpression {
-  static readonly TYPE_AND = "AND";
-  static readonly TYPE_OR = "OR";
+  public static readonly TYPE_AND = "AND";
+  public static readonly TYPE_OR = "OR";
 
   private readonly parts: (CompositeExpression | string)[];
 
@@ -12,21 +12,21 @@ export class CompositeExpression {
     this.parts = [part, ...rest];
   }
 
-  static and(
+  public static and(
     part: CompositeExpression | string,
     ...parts: (CompositeExpression | string)[]
   ): CompositeExpression {
     return new CompositeExpression("AND", part, ...parts);
   }
 
-  static or(
+  public static or(
     part: CompositeExpression | string,
     ...parts: (CompositeExpression | string)[]
   ): CompositeExpression {
     return new CompositeExpression("OR", part, ...parts);
   }
 
-  with(
+  public with(
     part: CompositeExpression | string,
     ...parts: (CompositeExpression | string)[]
   ): CompositeExpression {
@@ -44,15 +44,15 @@ export class CompositeExpression {
     return new CompositeExpression(this.type, first, ...restParts);
   }
 
-  getType(): "AND" | "OR" {
+  public getType(): "AND" | "OR" {
     return this.type;
   }
 
-  count(): number {
+  public count(): number {
     return this.parts.length;
   }
 
-  toString(): string {
+  public toString(): string {
     if (this.parts.length === 1) {
       return String(this.parts[0]);
     }

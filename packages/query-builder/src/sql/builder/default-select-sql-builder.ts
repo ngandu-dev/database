@@ -1,6 +1,6 @@
 import { AbstractPlatform } from "../../platforms/abstract-platform";
 import { NotSupported } from "../../platforms/exception/not-supported";
-import { ConflictResolutionMode } from "../../query/for-update";
+import { ConflictResolutionMode } from "../../query/for-update/conflict-resolution-mode";
 import { SelectQuery } from "../../query/select-query";
 import { SelectSQLBuilder } from "./select-sql-builder";
 
@@ -11,7 +11,7 @@ export class DefaultSelectSQLBuilder implements SelectSQLBuilder {
     private readonly skipLockedSQL: string | null,
   ) {}
 
-  buildSQL(query: SelectQuery): string {
+  public buildSQL(query: SelectQuery): string {
     const parts: string[] = ["SELECT"];
 
     if (query.distinct) {

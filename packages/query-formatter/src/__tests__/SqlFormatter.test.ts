@@ -9,35 +9,39 @@ import { fileDataPairs } from "./TestFixtures";
 describe("SqlFormatter", () => {
   const htmlFormatter = new SqlFormatter(new HtmlHighlighter());
 
-  test.each(
-    fileDataPairs("format-highlight.txt"),
-  )("format + highlight fixtures %#", (sql: string, html: string) => {
-    expect(htmlFormatter.format(sql)).toBe(html);
-  });
+  test.each(fileDataPairs("format-highlight.txt"))(
+    "format + highlight fixtures %#",
+    (sql: string, html: string) => {
+      expect(htmlFormatter.format(sql)).toBe(html);
+    },
+  );
 
   test.each(fileDataPairs("format.txt"))("format fixtures %#", (sql: string, formatted: string) => {
     const formatter = new SqlFormatter(new NullHighlighter());
     expect(formatter.format(sql)).toBe(formatted);
   });
 
-  test.each(
-    fileDataPairs("highlight.txt"),
-  )("highlight fixtures %#", (sql: string, html: string) => {
-    expect(htmlFormatter.highlight(sql)).toBe(html);
-  });
+  test.each(fileDataPairs("highlight.txt"))(
+    "highlight fixtures %#",
+    (sql: string, html: string) => {
+      expect(htmlFormatter.highlight(sql)).toBe(html);
+    },
+  );
 
-  test.each(
-    fileDataPairs("clihighlight.txt"),
-  )("cli highlight fixtures %#", (sql: string, ansiText: string) => {
-    const formatter = new SqlFormatter(new CliHighlighter());
-    expect(formatter.format(sql)).toBe(`${ansiText}\n`);
-  });
+  test.each(fileDataPairs("clihighlight.txt"))(
+    "cli highlight fixtures %#",
+    (sql: string, ansiText: string) => {
+      const formatter = new SqlFormatter(new CliHighlighter());
+      expect(formatter.format(sql)).toBe(`${ansiText}\n`);
+    },
+  );
 
-  test.each(
-    fileDataPairs("compress.txt"),
-  )("compress fixtures %#", (sql: string, compressed: string) => {
-    expect(htmlFormatter.compress(sql)).toBe(compressed);
-  });
+  test.each(fileDataPairs("compress.txt"))(
+    "compress fixtures %#",
+    (sql: string, compressed: string) => {
+      expect(htmlFormatter.compress(sql)).toBe(compressed);
+    },
+  );
 
   test("usePre option", () => {
     const noPreFormatter = new SqlFormatter(new HtmlHighlighter({}, false));

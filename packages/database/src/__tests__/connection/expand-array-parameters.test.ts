@@ -5,7 +5,7 @@ import { MissingNamedParameter } from "../../array-parameters/exception/missing-
 import { MissingPositionalParameter } from "../../array-parameters/exception/missing-positional-parameter";
 import { ExpandArrayParameters } from "../../expand-array-parameters";
 import { ParameterType } from "../../parameter-type";
-import type { QueryParameterTypes, QueryParameters, QueryScalarParameterType } from "../../query";
+import type { QueryParameters, QueryParameterTypes, QueryScalarParameterType } from "../../query";
 import { Parser } from "../../sql/parser";
 
 function expand(
