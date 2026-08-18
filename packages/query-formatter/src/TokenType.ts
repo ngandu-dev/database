@@ -1,0 +1,14 @@
+export enum TokenType {
+  WHITESPACE = 0,
+  WORD = 1,
+  QUOTE = 2,
+  BACKTICK_QUOTE = 3,
+  RESERVED = 4,
+  RESERVED_TOPLEVEL = 5,
+  RESERVED_NEWLINE = 6,
+  BOUNDARY = 7,
+  COMMENT = 8,
+  BLOCK_COMMENT = 9,
+  NUMBER = 10,
+  VARIABLE = 11,
+}
