@@ -1,0 +1,59 @@
+name: Functional Tests (postgresql)
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  test-postgresql:
+    name: functional (postgresql ${{ matrix.version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["10", "16", "17"]
+    services:
+      postgresql:
+        image: postgres:${{ matrix.version }}
+        env:
+          POSTGRES_DB: datazen
+          POSTGRES_USER: datazen
+          POSTGRES_PASSWORD: datazen
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U datazen -d datazen"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Cache Bun Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run Functional Tests (postgresql)
+        env:
+          DATAZEN_FUNCTIONAL_PLATFORM: postgresql
+          DATAZEN_FUNCTIONAL_SERVER_VERSION: ${{ matrix.version }}
+          DATAZEN_FUNCTIONAL_CONFIG_FILE: ci/github/vitest/postgresql.json
+        run: bun run test:functional

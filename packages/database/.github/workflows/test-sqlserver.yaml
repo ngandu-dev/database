@@ -1,0 +1,69 @@
+name: Functional Tests (sqlserver)
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  test-sqlserver:
+    name: functional (sqlserver ${{ matrix.version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - version: "2022"
+            image_tag: "2022-latest"
+          - version: "2025"
+            image_tag: "2025-latest"
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:${{ matrix.image_tag }}
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: Datazen123!
+        ports:
+          - 1433:1433
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Cache Bun Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Wait For SQL Server Port
+        shell: bash
+        run: |
+          for _ in {1..60}; do
+            if (echo > /dev/tcp/127.0.0.1/1433) >/dev/null 2>&1; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "SQL Server did not become reachable on port 1433 in time."
+          exit 1
+
+      - name: Run Functional Tests (sqlserver)
+        env:
+          DATAZEN_FUNCTIONAL_PLATFORM: sqlserver
+          DATAZEN_FUNCTIONAL_SERVER_VERSION: ${{ matrix.version }}
+          DATAZEN_FUNCTIONAL_CONFIG_FILE: ci/github/vitest/sqlserver.json
+        run: bun run test:functional

@@ -1,0 +1,13 @@
+{
+  "platform": "sqlserver",
+  "driver": "mssql",
+  "connection": {
+    "host": "127.0.0.1",
+    "port": 1433,
+    "user": "sa",
+    "password": "Datazen123!",
+    "database": "tempdb",
+    "encrypt": false,
+    "trustServerCertificate": true
+  }
+}

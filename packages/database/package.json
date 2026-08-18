@@ -1,0 +1,201 @@
+{
+  "name": "@devscast/datazen",
+  "version": "1.1.4",
+  "type": "module",
+  "source": "./src/_index.ts",
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    },
+    "./connections": {
+      "types": "./dist/connections.d.ts",
+      "import": "./dist/connections.js",
+      "require": "./dist/connections.cjs",
+      "default": "./dist/connections.js"
+    },
+    "./driver": {
+      "types": "./dist/driver.d.ts",
+      "import": "./dist/driver.js",
+      "require": "./dist/driver.cjs",
+      "default": "./dist/driver.js"
+    },
+    "./exception": {
+      "types": "./dist/exception.d.ts",
+      "import": "./dist/exception.js",
+      "require": "./dist/exception.cjs",
+      "default": "./dist/exception.js"
+    },
+    "./logging": {
+      "types": "./dist/logging.d.ts",
+      "import": "./dist/logging.js",
+      "require": "./dist/logging.cjs",
+      "default": "./dist/logging.js"
+    },
+    "./platforms": {
+      "types": "./dist/platforms.d.ts",
+      "import": "./dist/platforms.js",
+      "require": "./dist/platforms.cjs",
+      "default": "./dist/platforms.js"
+    },
+    "./portability": {
+      "types": "./dist/portability.d.ts",
+      "import": "./dist/portability.js",
+      "require": "./dist/portability.cjs",
+      "default": "./dist/portability.js"
+    },
+    "./query": {
+      "types": "./dist/query.d.ts",
+      "import": "./dist/query.js",
+      "require": "./dist/query.cjs",
+      "default": "./dist/query.js"
+    },
+    "./tools": {
+      "types": "./dist/tools.d.ts",
+      "import": "./dist/tools.js",
+      "require": "./dist/tools.cjs",
+      "default": "./dist/tools.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js",
+      "require": "./dist/types.cjs",
+      "default": "./dist/types.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "connections": [
+        "./dist/connections.d.ts"
+      ],
+      "driver": [
+        "./dist/driver.d.ts"
+      ],
+      "exception": [
+        "./dist/exception.d.ts"
+      ],
+      "logging": [
+        "./dist/logging.d.ts"
+      ],
+      "platforms": [
+        "./dist/platforms.d.ts"
+      ],
+      "portability": [
+        "./dist/portability.d.ts"
+      ],
+      "query": [
+        "./dist/query.d.ts"
+      ],
+      "tools": [
+        "./dist/tools.d.ts"
+      ],
+      "types": [
+        "./dist/types.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "package.json"
+  ],
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.7",
+    "@changesets/cli": "^2.30.0",
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
+    "@types/bun": "latest",
+    "@types/mssql": "^9.1.9",
+    "@types/node": "^25.5.0",
+    "@types/pg": "^8.18.0",
+    "@types/semver": "^7.7.1",
+    "@types/sqlite3": "^5.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.57.1",
+    "@typescript-eslint/parser": "^8.57.1",
+    "@vitest/coverage-v8": "^4.1.0",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
+    "husky": "^9.1.7",
+    "mssql": "^12.2.0",
+    "mysql2": "^3.20.0",
+    "pg": "^8.20.0",
+    "tsup": "^8.5.1",
+    "vitest": "^4.1.0"
+  },
+  "peerDependencies": {
+    "mssql": "^12.2.0",
+    "mysql2": "^3.17.2",
+    "pg": "^8.11.5",
+    "sqlite3": "^6.0.1"
+  },
+  "peerDependenciesMeta": {
+    "mssql": {
+      "optional": true
+    },
+    "mysql2": {
+      "optional": true
+    },
+    "pg": {
+      "optional": true
+    },
+    "sqlite3": {
+      "optional": true
+    }
+  },
+  "scripts": {
+    "build": "tsup --minify",
+    "dev": "tsup --watch",
+    "test": "vitest run --config vitest.unit.config.ts",
+    "test:all": "vitest run",
+    "test:functional": "bun scripts/test-functional.mjs",
+    "test:functional:local": "bun scripts/test-functional-local.mjs",
+    "test:coverage": "vitest run --config vitest.unit.config.ts --coverage",
+    "test:watch": "vitest",
+    "============= HUSKY =============": "",
+    "prepare": "husky",
+    "commit": "cz",
+    "=========== CODE STYLE ============": "",
+    "lint": "biome check && biome lint",
+    "format": "biome format --write && biome check --write && biome lint --write",
+    "typecheck": "tsc --noEmit",
+    "=========== NPM PUBLISH ==============": "",
+    "release": "npm run build && npm publish --access public",
+    "version": "changeset version"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "prettier --write",
+      "eslint --fix"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "author": "Bernard Ngandu <bernard@devscast.tech>",
+  "license": "MIT",
+  "description": "DataZen : TypeScript Database Abstraction Layer",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devscast/datazen-ts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/devscast/datazen-ts/issues"
+  },
+  "homepage": "https://github.com/devscast/datazen-ts#readme",
+  "dependencies": {
+    "semver": "^7.7.4"
+  }
+}

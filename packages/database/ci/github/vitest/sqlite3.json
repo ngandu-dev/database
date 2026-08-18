@@ -1,0 +1,7 @@
+{
+  "platform": "sqlite3",
+  "driver": "sqlite3",
+  "connection": {
+    "file": ":memory:"
+  }
+}

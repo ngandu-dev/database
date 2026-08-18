@@ -1,0 +1,6 @@
+export enum TrimMode {
+  UNSPECIFIED = "UNSPECIFIED",
+  LEADING = "LEADING",
+  TRAILING = "TRAILING",
+  BOTH = "BOTH",
+}

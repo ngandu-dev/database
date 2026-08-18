@@ -1,0 +1,18 @@
+{
+  "platform": "postgresql",
+  "driver": "pg",
+  "connection": {
+    "host": "127.0.0.1",
+    "port": 5432,
+    "user": "datazen",
+    "password": "datazen",
+    "database": "datazen"
+  },
+  "privilegedConnection": {
+    "host": "127.0.0.1",
+    "port": 5432,
+    "user": "datazen",
+    "password": "datazen",
+    "database": "datazen"
+  }
+}

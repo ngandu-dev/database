@@ -1,0 +1,39 @@
+name: CI
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    uses: ./.github/workflows/lint.yml
+    secrets: inherit
+
+  test:
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
+  functional-sqlite3:
+    needs: test
+    uses: ./.github/workflows/test-sqlite3.yaml
+    secrets: inherit
+
+  functional-mysql:
+    needs: test
+    uses: ./.github/workflows/test-mysql.yaml
+    secrets: inherit
+
+  functional-mariadb:
+    needs: test
+    uses: ./.github/workflows/test-mariadb.yaml
+    secrets: inherit
+
+  functional-postgresql:
+    needs: test
+    uses: ./.github/workflows/test-postgresql.yaml
+    secrets: inherit
+
+  functional-sqlserver:
+    needs: test
+    uses: ./.github/workflows/test-sqlserver.yaml
+    secrets: inherit
