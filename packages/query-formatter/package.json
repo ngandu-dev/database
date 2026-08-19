@@ -62,7 +62,6 @@
   },
   "homepage": "https://github.com/ngandu-dev/database/tree/main/packages/query-formatter#readme",
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   }
 }

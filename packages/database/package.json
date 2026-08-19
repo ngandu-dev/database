@@ -178,7 +178,6 @@
   },
   "homepage": "https://github.com/ngandu-dev/database/tree/main/packages/database#readme",
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   }
 }
