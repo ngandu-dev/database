@@ -145,7 +145,7 @@
     "sql-server"
   ],
   "dependencies": {
-    "@ngandu-dev/query-builder": "workspace:*",
+    "@ngandu-dev/query-builder": "^2.0.0",
     "semver": "^7.7.4"
   },
   "peerDependencies": {
