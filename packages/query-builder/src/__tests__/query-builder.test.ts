@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import { ArrayParameterType } from "../array-parameter-type";
 import { ParameterType } from "../parameter-type";
+import { MySQL80Platform } from "../platforms/mysql80-platform";
+import { ConflictResolutionMode } from "../query/for-update/conflict-resolution-mode";
 import { PlaceHolder, QueryBuilder } from "../query/query-builder";
 import { QueryException } from "../query/query-exception";
 import { UnionType } from "../query/union-type";
@@ -10,6 +12,21 @@ describe("QueryBuilder", () => {
   it("should instantiate without errors", () => {
     const qb = new QueryBuilder();
     expect(qb).toBeInstanceOf(QueryBuilder);
+  });
+
+  it("should remain construction-only", () => {
+    const qb = new QueryBuilder();
+
+    expect("executeQuery" in qb).toBe(false);
+    expect("executeStatement" in qb).toBe(false);
+    expect("fetchAllAssociative" in qb).toBe(false);
+  });
+
+  it("should compile with the injected platform", () => {
+    const qb = new QueryBuilder(new MySQL80Platform());
+    qb.select("u.id").from("users", "u").forUpdate(ConflictResolutionMode.SKIP_LOCKED);
+
+    expect(qb.getSQL()).toBe("SELECT u.id FROM users u FOR UPDATE SKIP LOCKED");
   });
 
   it("should build simple SELECT without FROM", () => {

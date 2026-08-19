@@ -11,4 +11,5 @@ export interface QueryBuilderPlatform {
       ...otherExpressions: CommonTableExpression[]
     ): string;
   };
+  quoteStringLiteral?(value: string): string;
 }

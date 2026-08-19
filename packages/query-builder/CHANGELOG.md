@@ -1,5 +1,24 @@
 # @ngandu-dev/query-builder
 
+## 3.0.2
+
+### Changed
+
+- Made the query builder the canonical owner of query models, binding enums, SQL-builder contracts, and query-specific dialect strategies used by `@ngandu-dev/database`.
+- Replaced concrete platform dependencies in the default SELECT and UNION builders with narrow SQL dialect capability interfaces.
+- Added version-aware MySQL 8 locking support and aligned DB2 and SQL Server locking SQL with the database package.
+- Changed array parameter token values to distinct `ARRAY_*` values so adapters can reliably distinguish arrays from scalar bindings.
+- Made `QueryBuilder` a synchronous construction-only API with platform injection; database execution now belongs exclusively to `@ngandu-dev/database`.
+
+### Removed
+
+- Removed `QueryBuilderConnection`, `DefaultQueryBuilderConnection`, `QueryResult`, and all execution and fetch methods from the standalone builder.
+
+### Fixed
+
+- Fixed SQL Server and DB2 `FOR UPDATE` generation in standalone usage.
+- Fixed the collision between scalar and array parameter type values.
+
 ## 2.0.0
 
 ### Changed

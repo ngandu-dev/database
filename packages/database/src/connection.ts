@@ -23,6 +23,7 @@ import type {
   QueryScalarParameterType,
 } from "./query";
 import { Query } from "./query";
+import { ConnectedQueryBuilder } from "./query/connected-query-builder";
 import { ExpressionBuilder } from "./query/expression/expression-builder";
 import { QueryBuilder } from "./query/query-builder";
 import { Result } from "./result";
@@ -121,8 +122,8 @@ export class Connection {
     return new ExpressionBuilder(this);
   }
 
-  public createQueryBuilder(): QueryBuilder {
-    return new QueryBuilder(this);
+  public createQueryBuilder(): ConnectedQueryBuilder {
+    return new ConnectedQueryBuilder(this);
   }
 
   public isConnected(): boolean {
@@ -154,6 +155,10 @@ export class Connection {
     }
   }
 
+  public async executeQuery(queryBuilder: QueryBuilder): Promise<Result>;
+  public async executeQuery<T extends AssociativeRow>(
+    queryBuilder: QueryBuilder,
+  ): Promise<Result<T>>;
   public async executeQuery(
     sql: string,
     params?: QueryParameters,
@@ -165,14 +170,14 @@ export class Connection {
     types?: QueryParameterTypes,
   ): Promise<Result<T>>;
   public async executeQuery(
-    sql: string,
+    queryOrSql: QueryBuilder | string,
     params: QueryParameters = [],
     types: QueryParameterTypes = [],
   ): Promise<Result> {
     await this.connect();
-    const [boundParams, boundTypes] = this.normalizeParameters(params, types);
-    const compiledQuery = this.compileQuery(sql, boundParams, boundTypes);
-    const query = new Query(sql, params, types);
+    const query = this.resolveQuery(queryOrSql, params, types);
+    const [boundParams, boundTypes] = this.normalizeParameters(query.parameters, query.types);
+    const compiledQuery = this.compileQuery(query.sql, boundParams, boundTypes);
 
     try {
       const result = await this.executeDriverQuery(compiledQuery);
@@ -182,15 +187,21 @@ export class Connection {
     }
   }
 
+  public async executeStatement(queryBuilder: QueryBuilder): Promise<number>;
   public async executeStatement(
     sql: string,
+    params?: QueryParameters,
+    types?: QueryParameterTypes,
+  ): Promise<number>;
+  public async executeStatement(
+    queryOrSql: QueryBuilder | string,
     params: QueryParameters = [],
     types: QueryParameterTypes = [],
   ): Promise<number> {
     await this.connect();
-    const [boundParams, boundTypes] = this.normalizeParameters(params, types);
-    const compiledQuery = this.compileQuery(sql, boundParams, boundTypes);
-    const query = new Query(sql, params, types);
+    const query = this.resolveQuery(queryOrSql, params, types);
+    const [boundParams, boundTypes] = this.normalizeParameters(query.parameters, query.types);
+    const compiledQuery = this.compileQuery(query.sql, boundParams, boundTypes);
 
     try {
       return await this.executeDriverStatement(compiledQuery);
@@ -1048,6 +1059,22 @@ export class Connection {
 
   private isPromiseLike<T>(value: T | Promise<T>): value is Promise<T> {
     return typeof value === "object" && value !== null && "then" in value;
+  }
+
+  private resolveQuery(
+    queryOrSql: QueryBuilder | string,
+    params: QueryParameters,
+    types: QueryParameterTypes,
+  ): Query {
+    if (typeof queryOrSql === "string") {
+      return new Query(queryOrSql, params, types);
+    }
+
+    return new Query(
+      queryOrSql.getSQL(this.getDatabasePlatform()),
+      queryOrSql.getParameters(),
+      queryOrSql.getParameterTypes(),
+    );
   }
 
   private normalizeParameters(

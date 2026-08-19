@@ -1,6 +1,1 @@
-export class From {
-  constructor(
-    public readonly table: string,
-    public readonly alias: string | null = null,
-  ) {}
-}
+export { From } from "@ngandu-dev/query-builder";

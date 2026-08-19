@@ -1,10 +1,9 @@
 import { ArrayParameterType } from "../array-parameter-type";
-import { DefaultQueryBuilderConnection } from "../default-query-builder-connection";
 import { ParameterType } from "../parameter-type";
+import { MySQLPlatform } from "../platforms/mysql-platform";
 import { CommonTableExpression } from "../query/common-table-expression";
-import type { QueryBuilderConnection } from "../query-builder-connection";
+import type { QueryBuilderPlatform } from "../query-builder-platform";
 import type { QueryParameters, QueryParameterTypes } from "../query-parameter";
-import type { QueryResult } from "../query-result";
 import { NonUniqueAlias } from "./exception/non-unique-alias";
 import { UnknownAlias } from "./exception/unknown-alias";
 import { CompositeExpression } from "./expression/composite-expression";
@@ -31,6 +30,7 @@ export enum PlaceHolder {
 
 export class QueryBuilder {
   private sql: string | null = null;
+  private compiledPlatform: QueryBuilderPlatform | null = null;
   private params: QueryParameters = [];
   private types: QueryParameterTypes = [];
   private type: QueryType = QueryType.SELECT;
@@ -53,64 +53,29 @@ export class QueryBuilder {
   private _forUpdate: ForUpdate | null = null;
   private _values: Record<string, any> = {};
 
-  constructor(
-    private readonly connection: QueryBuilderConnection = new DefaultQueryBuilderConnection(),
-  ) {}
+  constructor(private readonly platform: QueryBuilderPlatform = new MySQLPlatform()) {}
 
   public expr(): ExpressionBuilder {
-    return this.connection.createExpressionBuilder();
+    return new ExpressionBuilder({
+      quote: async (value: string): Promise<string> => {
+        const quoteStringLiteral = this.platform.quoteStringLiteral;
+        if (quoteStringLiteral === undefined) {
+          throw new Error("The configured query platform cannot quote string literals.");
+        }
+
+        return quoteStringLiteral.call(this.platform, value);
+      },
+    });
   }
 
   public sub(): QueryBuilder {
-    return this.connection.createQueryBuilder();
+    return new QueryBuilder(this.platform);
   }
 
-  public executeQuery<T extends AssociativeRow = AssociativeRow>(): Promise<QueryResult<T>> {
-    return this.connection.executeQuery<T>(this.getSQL(), this.params, this.types);
-  }
+  public getSQL(platform: QueryBuilderPlatform = this.platform): string {
+    if (this.sql !== null && this.compiledPlatform === platform) return this.sql;
 
-  public executeStatement(): Promise<number> {
-    return this.connection.executeStatement(this.getSQL(), this.params, this.types);
-  }
-
-  public async fetchAssociative<T extends AssociativeRow = AssociativeRow>(): Promise<
-    T | undefined
-  > {
-    return (await this.executeQuery()).fetchAssociative<T>();
-  }
-
-  public async fetchNumeric<T extends unknown[] = unknown[]>(): Promise<T | undefined> {
-    return (await this.executeQuery()).fetchNumeric<T>();
-  }
-
-  public async fetchOne<T = unknown>(): Promise<T | undefined> {
-    return (await this.executeQuery()).fetchOne<T>();
-  }
-
-  public async fetchAllNumeric<T extends unknown[] = unknown[]>(): Promise<T[]> {
-    return (await this.executeQuery()).fetchAllNumeric<T>();
-  }
-
-  public async fetchAllAssociative<T extends AssociativeRow = AssociativeRow>(): Promise<T[]> {
-    return (await this.executeQuery()).fetchAllAssociative<T>();
-  }
-
-  public async fetchAllKeyValue<T = unknown>(): Promise<Record<string, T>> {
-    return (await this.executeQuery()).fetchAllKeyValue<T>();
-  }
-
-  public async fetchAllAssociativeIndexed<T extends AssociativeRow = AssociativeRow>(): Promise<
-    Record<string, T>
-  > {
-    return (await this.executeQuery()).fetchAllAssociativeIndexed<T>();
-  }
-
-  public async fetchFirstColumn<T = unknown>(): Promise<T[]> {
-    return (await this.executeQuery()).fetchFirstColumn<T>();
-  }
-
-  public getSQL(): string {
-    if (this.sql !== null) return this.sql;
+    this.compiledPlatform = platform;
 
     switch (this.type) {
       case QueryType.INSERT:
@@ -123,10 +88,10 @@ export class QueryBuilder {
         this.sql = this.getSQLForUpdate();
         return this.sql;
       case QueryType.SELECT:
-        this.sql = this.getSQLForSelect();
+        this.sql = this.getSQLForSelect(platform);
         return this.sql;
       case QueryType.UNION:
-        this.sql = this.getSQLForUnion();
+        this.sql = this.getSQLForUnion(platform);
         return this.sql;
     }
   }
@@ -622,12 +587,11 @@ export class QueryBuilder {
     return new CompositeExpression(type, first, ...others.filter((p) => p !== undefined));
   }
 
-  private getSQLForSelect(): string {
+  private getSQLForSelect(databasePlatform: QueryBuilderPlatform): string {
     if (this._select.length === 0) {
       throw new QueryException("No SELECT expressions given. Please use select() or addSelect().");
     }
 
-    const databasePlatform = this.connection.getDatabasePlatform();
     const selectParts: string[] = [];
     if (this.commonTableExpressions.length > 0) {
       const [expression, ...rest] = this.commonTableExpressions;
@@ -719,7 +683,7 @@ export class QueryBuilder {
     return query;
   }
 
-  private getSQLForUnion(): string {
+  private getSQLForUnion(databasePlatform: QueryBuilderPlatform): string {
     const countUnions = this.unionParts.length;
     if (countUnions < 2) {
       throw new QueryException(
@@ -728,8 +692,7 @@ export class QueryBuilder {
       );
     }
 
-    return this.connection
-      .getDatabasePlatform()
+    return databasePlatform
       .createUnionSQLBuilder()
       .buildSQL(
         new UnionQuery(

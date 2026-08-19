@@ -14,6 +14,29 @@ const conn = DriverManager.getConnection({ driver: "mysql2", pool });
 const qb = conn.createQueryBuilder();
 ```
 
+Builder Variants
+----------------
+
+`conn.createQueryBuilder()` returns a connected builder for application code. It
+extends the standalone builder and preserves the legacy execution and fetch API,
+but delegates every database operation to `Connection`. There is only one
+connection, parameter-binding, execution, and error-conversion implementation.
+
+For SQL construction without I/O, use the standalone variant:
+
+```ts
+import { StandaloneQueryBuilder } from "@ngandu-dev/database/query";
+
+const query = new StandaloneQueryBuilder()
+  .select("id", "email")
+  .from("users");
+
+console.log(query.getSQL());
+```
+
+The standalone builder has no execution or fetch methods. It can also be
+imported as `QueryBuilder` from `@ngandu-dev/query-builder`.
+
 Security: Preventing SQL Injection
 ----------------------------------
 
@@ -259,6 +282,13 @@ Execution API
 - `fetchAllKeyValue()` (async)
 - `fetchAllAssociativeIndexed()` (async)
 - `fetchFirstColumn()` (async)
+
+These methods exist only on the connected builder returned by
+`Connection#createQueryBuilder()`. They delegate to `Connection`, which first
+connects and resolves any server-version-dependent platform before compiling
+and executing the query. Calling synchronous `getSQL()` directly on such a
+builder requires the connection platform to already be available; execution
+methods resolve it automatically.
 
 Not Implemented
 ---------------

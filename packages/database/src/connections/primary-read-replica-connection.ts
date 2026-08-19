@@ -3,6 +3,7 @@ import { Connection } from "../connection";
 import type { Driver } from "../driver";
 import type { Connection as DriverConnection } from "../driver/connection";
 import type { QueryParameters, QueryParameterTypes } from "../query";
+import type { QueryBuilder } from "../query/query-builder";
 import type { Statement } from "../statement";
 
 type OverrideParams = Record<string, unknown>;
@@ -82,14 +83,22 @@ export class PrimaryReadReplicaConnection extends Connection {
     await this.performConnect("replica");
   }
 
+  public override async executeStatement(queryBuilder: QueryBuilder): Promise<number>;
   public override async executeStatement(
     sql: string,
+    params?: QueryParameters,
+    types?: QueryParameterTypes,
+  ): Promise<number>;
+  public override async executeStatement(
+    queryOrSql: QueryBuilder | string,
     params: QueryParameters = [],
     types: QueryParameterTypes = [],
   ): Promise<number> {
     await this.ensureConnectedToPrimary();
 
-    return super.executeStatement(sql, params, types);
+    return typeof queryOrSql === "string"
+      ? super.executeStatement(queryOrSql, params, types)
+      : super.executeStatement(queryOrSql);
   }
 
   public override async beginTransaction(): Promise<void> {

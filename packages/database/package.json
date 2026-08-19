@@ -1,6 +1,6 @@
 {
   "name": "@ngandu-dev/database",
-  "version": "2.0.0",
+  "version": "3.0.2",
   "description": "A TypeScript database abstraction layer inspired by Doctrine DBAL.",
   "license": "MIT",
   "author": "Bernard Ngandu <bernard@ngandu.dev>",
@@ -145,7 +145,7 @@
     "sql-server"
   ],
   "dependencies": {
-    "@ngandu-dev/query-builder": "^2.0.0",
+    "@ngandu-dev/query-builder": "^3.0.2",
     "semver": "^7.7.4"
   },
   "peerDependencies": {

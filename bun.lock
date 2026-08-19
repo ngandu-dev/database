@@ -26,9 +26,9 @@
     },
     "packages/database": {
       "name": "@ngandu-dev/database",
-      "version": "2.0.0",
+      "version": "3.0.2",
       "dependencies": {
-        "@ngandu-dev/query-builder": "^2.0.0",
+        "@ngandu-dev/query-builder": "^3.0.2",
         "semver": "^7.7.4",
       },
       "peerDependencies": {
@@ -46,7 +46,7 @@
     },
     "packages/query-builder": {
       "name": "@ngandu-dev/query-builder",
-      "version": "2.0.0",
+      "version": "3.0.2",
     },
     "packages/query-formatter": {
       "name": "@ngandu-dev/query-formatter",

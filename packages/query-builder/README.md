@@ -12,7 +12,7 @@ A composable, database-agnostic SQL query builder for TypeScript and Node.js.
 - SELECT, INSERT, UPDATE, DELETE, UNION, joins, CTEs, grouping, and ordering
 - Named and positional parameters
 - Vendor-aware limit, locking, and SQL generation
-- Optional execution through a small connection contract
+- Synchronous, side-effect-free SQL construction and compilation
 - No dependency on `@ngandu-dev/database`
 
 ## Requirements
@@ -41,7 +41,25 @@ console.log(query.getSQL());
 
 ## Usage
 
-The default connection builds MySQL-compatible SQL without executing it. Pass a `QueryBuilderConnection` implementation to the constructor to supply another platform and enable `executeQuery`, `executeStatement`, and fetch helpers. `@ngandu-dev/database` provides that integration.
+`QueryBuilder` only constructs SQL and stores parameters. It never opens a connection or executes a query. The default platform emits MySQL-compatible SQL; inject another platform when you need vendor-specific compilation.
+
+```ts
+import {
+  ConflictResolutionMode,
+  MySQL80Platform,
+  QueryBuilder,
+} from "@ngandu-dev/query-builder";
+
+const query = new QueryBuilder(new MySQL80Platform())
+  .select("id")
+  .from("jobs")
+  .forUpdate(ConflictResolutionMode.SKIP_LOCKED);
+
+console.log(query.getSQL());
+// SELECT id FROM jobs FOR UPDATE SKIP LOCKED
+```
+
+Use `@ngandu-dev/database` when the builder should be attached to a live connection. Its connected builder extends this class and adds execution and fetch helpers that delegate to `Connection`.
 
 ```ts
 import { DriverManager } from "@ngandu-dev/database";

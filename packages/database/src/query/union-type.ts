@@ -1,4 +1,1 @@
-export enum UnionType {
-  ALL,
-  DISTINCT,
-}
+export { UnionType } from "@ngandu-dev/query-builder";

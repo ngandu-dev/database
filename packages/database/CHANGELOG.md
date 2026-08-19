@@ -1,5 +1,20 @@
 # @ngandu-dev/database
 
+## 3.0.2
+
+### Changed
+
+- Replaced duplicated query models, binding enums, SQL builders, and platform exceptions with compatibility re-exports from `@ngandu-dev/query-builder`.
+- Made `Connection` and `AbstractPlatform` explicitly implement the standalone query-builder contracts.
+- Expanded `@ngandu-dev/database/query` to expose the canonical query model and expression symbols.
+- Added `ConnectedQueryBuilder`, a compatibility façade that extends the standalone builder while delegating all execution and fetch operations to `Connection`.
+- Allowed `Connection#executeQuery()` and `Connection#executeStatement()` to execute standalone query-builder instances after resolving the active database platform.
+
+### Fixed
+
+- Fixed array expansion when bindings originate from the standalone query-builder package.
+- Unified DB2, MySQL, and SQL Server locking behavior across the standalone and database-backed query surfaces.
+
 ## 2.0.0
 
 ### Changed

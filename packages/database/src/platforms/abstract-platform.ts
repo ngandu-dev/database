@@ -1,3 +1,4 @@
+import type { QueryBuilderPlatform, UnionSQLDialect } from "@ngandu-dev/query-builder";
 import type { Connection } from "../connection";
 import { InvalidArgumentException } from "../exception/invalid-argument-exception";
 import { ColumnValuesRequired } from "../exception/invalid-column-type/column-values-required";
@@ -19,7 +20,7 @@ import { EmptyKeywords } from "./keywords/empty-keywords";
 import { KeywordList } from "./keywords/keyword-list";
 import { TrimMode } from "./trim-mode";
 
-export abstract class AbstractPlatform {
+export abstract class AbstractPlatform implements QueryBuilderPlatform, UnionSQLDialect {
   private datazenTypeMapping: Record<string, string> | null = null;
   private reservedKeywords: KeywordList | null = null;
 

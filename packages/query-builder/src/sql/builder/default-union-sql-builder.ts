@@ -1,10 +1,10 @@
-import { AbstractPlatform } from "../../platforms/abstract-platform";
 import { UnionQuery } from "../../query/union-query";
 import { UnionType } from "../../query/union-type";
+import type { UnionSQLDialect } from "../dialect";
 import { UnionSQLBuilder } from "./union-sql-builder";
 
 export class DefaultUnionSQLBuilder implements UnionSQLBuilder {
-  constructor(private readonly platform: AbstractPlatform) {}
+  constructor(private readonly platform: UnionSQLDialect) {}
 
   public buildSQL(query: UnionQuery): string {
     const parts: string[] = [];

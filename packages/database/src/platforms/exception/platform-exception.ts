@@ -1,3 +1,1 @@
-import { Exception } from "../../exception";
-
-export interface PlatformException extends Exception {}
+export type { PlatformException } from "@ngandu-dev/query-builder";

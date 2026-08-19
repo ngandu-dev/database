@@ -13,6 +13,7 @@ import type { Connection as DriverConnection } from "../../driver/connection";
 import { DriverException } from "../../exception/driver-exception";
 import { ParameterType } from "../../parameter-type";
 import { MySQLPlatform } from "../../platforms/mysql-platform";
+import { MySQL80Platform } from "../../platforms/mysql80-platform";
 import type { QueryParameters, QueryParameterTypes } from "../../query";
 import { NonUniqueAlias } from "../../query/exception/non-unique-alias";
 import { UnknownAlias } from "../../query/exception/unknown-alias";
@@ -29,6 +30,7 @@ import { Union } from "../../query/union";
 import { UnionQuery } from "../../query/union-query";
 import { UnionType } from "../../query/union-type";
 import { Result } from "../../result";
+import type { ServerVersionProvider } from "../../server-version-provider";
 
 describe("Query API surface parity", () => {
   it("adds SelectQuery getters and distinct flag accessor", () => {
@@ -121,6 +123,8 @@ class NoopExceptionConverter implements ExceptionConverter {
 }
 
 class NoopDriverConnection implements DriverConnection {
+  public readonly queries: string[] = [];
+
   public async prepare(_sql: string) {
     return {
       bindValue: () => undefined,
@@ -128,7 +132,8 @@ class NoopDriverConnection implements DriverConnection {
     };
   }
 
-  public async query(_sql: string) {
+  public async query(sql: string) {
+    this.queries.push(sql);
     return new ArrayResult([], [], 0);
   }
 
@@ -174,8 +179,25 @@ class NoopDriver implements Driver {
     return this.exceptionConverter;
   }
 
-  public getDatabasePlatform(): MySQLPlatform {
+  public getDatabasePlatform(
+    _versionProvider: ServerVersionProvider,
+  ): MySQLPlatform | Promise<MySQLPlatform> {
     return new MySQLPlatform();
+  }
+}
+
+class LazyPlatformDriver extends NoopDriver {
+  public readonly connection = new NoopDriverConnection();
+
+  public override async connect(_params: Record<string, unknown>): Promise<DriverConnection> {
+    return this.connection;
+  }
+
+  public override async getDatabasePlatform(
+    versionProvider: ServerVersionProvider,
+  ): Promise<MySQLPlatform> {
+    await versionProvider.getServerVersion();
+    return new MySQL80Platform();
   }
 }
 
@@ -205,19 +227,33 @@ class SpyExecutionConnection extends Connection {
   }
 
   public override async executeQuery(
-    sql: string,
+    queryOrSql: QueryBuilder | string,
     params: QueryParameters = [],
     types: QueryParameterTypes = [],
   ): Promise<Result> {
+    const sql =
+      typeof queryOrSql === "string" ? queryOrSql : queryOrSql.getSQL(this.getDatabasePlatform());
+    if (typeof queryOrSql !== "string") {
+      params = queryOrSql.getParameters();
+      types = queryOrSql.getParameterTypes();
+    }
+
     this.queryCalls.push({ params, sql, types });
     return new Result(new ArrayResult([...this.queryRows]), this);
   }
 
   public override async executeStatement(
-    sql: string,
+    queryOrSql: QueryBuilder | string,
     params: QueryParameters = [],
     types: QueryParameterTypes = [],
   ): Promise<number> {
+    const sql =
+      typeof queryOrSql === "string" ? queryOrSql : queryOrSql.getSQL(this.getDatabasePlatform());
+    if (typeof queryOrSql !== "string") {
+      params = queryOrSql.getParameters();
+      types = queryOrSql.getParameterTypes();
+    }
+
     this.statementCalls.push({ params, sql, types });
     return this.statementResult;
   }
@@ -1103,6 +1139,19 @@ describe("QueryBuilder", () => {
         types: { status: ParameterType.STRING },
       },
     ]);
+  });
+
+  it("should resolve an asynchronous platform before executing a connected builder", async () => {
+    const driver = new LazyPlatformDriver();
+    const connection = new Connection({}, driver);
+    const qb = connection.createQueryBuilder();
+
+    qb.select("u.id").from("users", "u").forUpdate(ConflictResolutionMode.SKIP_LOCKED);
+
+    await qb.executeQuery();
+
+    expect(connection.getDatabasePlatform()).toBeInstanceOf(MySQL80Platform);
+    expect(driver.connection.queries).toEqual(["SELECT u.id FROM users u FOR UPDATE SKIP LOCKED"]);
   });
 
   it("should fetch associative through connection", async () => {

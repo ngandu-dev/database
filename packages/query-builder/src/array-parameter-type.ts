@@ -1,10 +1,10 @@
 import { ParameterType } from "./parameter-type";
 
 export enum ArrayParameterType {
-  INTEGER = "INTEGER",
-  STRING = "STRING",
-  ASCII = "ASCII",
-  BINARY = "BINARY",
+  INTEGER = "ARRAY_INTEGER",
+  STRING = "ARRAY_STRING",
+  ASCII = "ARRAY_ASCII",
+  BINARY = "ARRAY_BINARY",
 }
 
 export namespace ArrayParameterType {

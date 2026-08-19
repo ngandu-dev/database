@@ -1,7 +1,1 @@
-export enum QueryType {
-  SELECT,
-  INSERT,
-  UPDATE,
-  DELETE,
-  UNION,
-}
+export { QueryType } from "@ngandu-dev/query-builder";

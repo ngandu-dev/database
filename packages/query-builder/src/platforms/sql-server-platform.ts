@@ -1,6 +1,12 @@
+import type { SelectSQLBuilder } from "../sql/builder/select-sql-builder";
+import { SQLServerSelectSQLBuilder } from "../sql/builder/sql-server-select-sql-builder";
 import { AbstractPlatform } from "./abstract-platform";
 
-export abstract class SQLServerPlatform extends AbstractPlatform {
+export class SQLServerPlatform extends AbstractPlatform {
+  public override createSelectSQLBuilder(): SelectSQLBuilder {
+    return new SQLServerSelectSQLBuilder(this);
+  }
+
   protected doModifyLimitQuery(query: string, limit: number | null, offset: number): string {
     if (limit === null && offset <= 0) {
       return query;

@@ -1,4 +1,1 @@
-export enum ConflictResolutionMode {
-  ORDINARY,
-  SKIP_LOCKED,
-}
+export { ConflictResolutionMode } from "@ngandu-dev/query-builder";

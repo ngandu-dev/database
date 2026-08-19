@@ -1,12 +1,12 @@
-import { AbstractPlatform } from "../../platforms/abstract-platform";
 import { NotSupported } from "../../platforms/exception/not-supported";
 import { ConflictResolutionMode } from "../../query/for-update/conflict-resolution-mode";
 import { SelectQuery } from "../../query/select-query";
+import type { LimitSQLDialect } from "../dialect";
 import { SelectSQLBuilder } from "./select-sql-builder";
 
 export class DefaultSelectSQLBuilder implements SelectSQLBuilder {
   constructor(
-    private readonly platform: AbstractPlatform,
+    private readonly platform: LimitSQLDialect,
     private readonly forUpdateSQL: string | null,
     private readonly skipLockedSQL: string | null,
   ) {}

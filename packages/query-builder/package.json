@@ -1,6 +1,6 @@
 {
   "name": "@ngandu-dev/query-builder",
-  "version": "2.0.0",
+  "version": "3.0.2",
   "description": "A composable SQL query builder for TypeScript and Node.js.",
   "license": "MIT",
   "author": "Bernard Ngandu <bernard@ngandu.dev>",

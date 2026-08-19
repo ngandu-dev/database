@@ -1,5 +1,1 @@
-import { UnionQuery } from "../../query/union-query";
-
-export interface UnionSQLBuilder {
-  buildSQL(query: UnionQuery): string;
-}
+export type { UnionSQLBuilder } from "@ngandu-dev/query-builder";

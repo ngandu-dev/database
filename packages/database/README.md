@@ -54,6 +54,10 @@ const users = await connection
 
 Detailed guides are available in [`docs/`](docs), including configuration, transactions, platforms, portability, types, and schema support.
 
+`connection.createQueryBuilder()` returns a connected builder. It has the same construction API as `@ngandu-dev/query-builder`, plus the legacy execution and fetch helpers. Those helpers are thin delegates: `Connection` remains the only component that connects, resolves the database platform, binds parameters, executes SQL, and converts driver errors.
+
+For construction without a connection, import `StandaloneQueryBuilder` from `@ngandu-dev/database/query` or import `QueryBuilder` directly from `@ngandu-dev/query-builder`.
+
 ## Development
 
 From the monorepo root:

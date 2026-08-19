@@ -1,5 +1,8 @@
-import type { QueryBuilderConnection } from "../../query-builder-connection";
 import { CompositeExpression } from "../expression/composite-expression";
+
+export interface ExpressionBuilderQuoter {
+  quote(value: string): Promise<string>;
+}
 
 export class ExpressionBuilder {
   public static readonly EQ = "=";
@@ -9,7 +12,7 @@ export class ExpressionBuilder {
   public static readonly GT = ">";
   public static readonly GTE = ">=";
 
-  constructor(private readonly connection: QueryBuilderConnection) {}
+  constructor(private readonly quoter: ExpressionBuilderQuoter) {}
 
   /**
    * Creates a conjunction of the given expressions.
@@ -160,6 +163,6 @@ export class ExpressionBuilder {
    * The usage of this method is discouraged. Use prepared statements
    */
   public async literal(input: string): Promise<string> {
-    return await this.connection.quote(input);
+    return await this.quoter.quote(input);
   }
 }
