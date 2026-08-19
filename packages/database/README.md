@@ -85,6 +85,6 @@ Released under the [MIT License](LICENSE).
 
 ## Contributors
 
-<a href="https://github.com/ngandu-dev/database/graphs/contributors">
+<a href="https://github.com/ngandu-dev/database/graphs/contributors" title="Show all contributors">
   <img src="https://contrib.rocks/image?repo=ngandu-dev/database" alt="Contributors" />
 </a>

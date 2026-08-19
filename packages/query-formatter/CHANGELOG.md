@@ -1,6 +1,6 @@
 # @ngandu-dev/query-formatter
 
-## 2.0.0 - Unreleased
+## 2.0.0
 
 ### Changed
 
