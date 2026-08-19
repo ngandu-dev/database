@@ -76,8 +76,10 @@ function mySqlVersionProvider(): Array<[string, new (...args: never[]) => Abstra
     ["10.5.2-MariaDB-1~lenny-log", MariaDB1052Platform],
     ["10.6.0-MariaDB-1~lenny-log", MariaDB1060Platform],
     ["10.9.3-MariaDB-1~lenny-log", MariaDB1060Platform],
+    ["10.11.0-MariaDB", MariaDB1010Platform],
     ["11.0.2-MariaDB-1:11.0.2+maria~ubu2204", MariaDB1010Platform],
     ["11.7.1-MariaDB-ubu2404", MariaDB110700Platform],
+    ["11.8.0-MariaDB", MariaDB110700Platform],
   ];
 }
 

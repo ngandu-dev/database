@@ -99,7 +99,7 @@ jobs:
       - name: Run functional tests
         env:
           DATAZEN_FUNCTIONAL_PLATFORM: mariadb
-          DATAZEN_FUNCTIONAL_SERVER_VERSION: ${{ matrix.version }}
+          DATAZEN_FUNCTIONAL_SERVER_VERSION: "${{ matrix.version }}.0-MariaDB"
           DATAZEN_FUNCTIONAL_CONFIG_FILE: ci/github/vitest/mariadb.json
         working-directory: packages/database
         run: bun run test:functional
