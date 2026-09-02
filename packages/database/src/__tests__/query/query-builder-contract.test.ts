@@ -12,6 +12,7 @@ import {
   UnionType as BuilderUnionType,
   QueryBuilder,
 } from "@ngandu-dev/query-builder";
+import { describe, expect, it } from "vitest";
 
 import { ArrayParameterType } from "../../array-parameter-type";
 import { ExpandArrayParameters } from "../../expand-array-parameters";

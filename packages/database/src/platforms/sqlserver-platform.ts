@@ -15,6 +15,10 @@ import { SQLServerMetadataProvider } from "./sqlserver/sqlserver-metadata-provid
 import { TrimMode } from "./trim-mode";
 
 export class SQLServerPlatform extends AbstractPlatform {
+  public override getListDatabasesSQL(): string {
+    return "SELECT name FROM sys.databases ORDER BY name";
+  }
+
   public static readonly OPTION_DEFAULT_CONSTRAINT_NAME = "default_constraint_name";
 
   public override createSelectSQLBuilder(): SelectSQLBuilder {

@@ -1,5 +1,11 @@
 # @ngandu-dev/database
 
+## 3.0.3
+
+### Added
+
+- Added platform-owned database-listing SQL for PostgreSQL, MySQL/MariaDB, and SQL Server consumers such as `@ngandu-dev/database-mcp`.
+
 ## 3.0.2
 
 ### Changed

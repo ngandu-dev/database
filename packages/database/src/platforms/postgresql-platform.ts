@@ -11,6 +11,10 @@ import { PostgreSQLKeywords } from "./keywords/postgresql-keywords";
 import { PostgreSQLMetadataProvider } from "./postgresql/postgresql-metadata-provider";
 
 export class PostgreSQLPlatform extends AbstractPlatform {
+  public override getListDatabasesSQL(): string {
+    return "SELECT datname FROM pg_database WHERE datallowconn AND NOT datistemplate ORDER BY datname";
+  }
+
   protected useBooleanTrueFalseStrings = true;
 
   private readonly booleanLiterals = {

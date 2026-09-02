@@ -1,6 +1,6 @@
 {
   "name": "@ngandu-dev/database",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "A TypeScript database abstraction layer inspired by Doctrine DBAL.",
   "license": "MIT",
   "author": "Bernard Ngandu <bernard@ngandu.dev>",

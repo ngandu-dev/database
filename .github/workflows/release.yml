@@ -15,6 +15,9 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    outputs:
+      database_mcp_published: ${{ steps.database_mcp.outputs.published }}
+      database_mcp_version: ${{ steps.database_mcp.outputs.version }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -29,6 +32,7 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run quality
       - name: Create release pull request or publish changed packages
+        id: changesets
         uses: changesets/action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -36,3 +40,99 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
+      - name: Detect database MCP publication
+        id: database_mcp
+        env:
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.published-packages }}
+        run: |
+          node <<'NODE'
+          const fs = require("node:fs");
+          const packages = JSON.parse(process.env.PUBLISHED_PACKAGES || "[]");
+          const published = packages.find((item) => item.name === "@ngandu-dev/database-mcp");
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `published=${published ? "true" : "false"}\n`);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `version=${published?.version ?? ""}\n`);
+          NODE
+
+  database-mcp-native:
+    needs: release
+    if: needs.release.outputs.database_mcp_published == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            platform: macos
+            arch: arm64
+            executable: ngandu-database-mcp
+          - runner: macos-15-intel
+            platform: macos
+            arch: x64
+            executable: ngandu-database-mcp
+          - runner: ubuntu-24.04
+            platform: linux
+            arch: x64
+            executable: ngandu-database-mcp
+          - runner: ubuntu-24.04-arm
+            platform: linux
+            arch: arm64
+            executable: ngandu-database-mcp
+          - runner: windows-2025
+            platform: windows
+            arch: x64
+            executable: ngandu-database-mcp.exe
+    runs-on: ${{ matrix.runner }}
+    env:
+      MCP_VERSION: ${{ needs.release.outputs.database_mcp_version }}
+      MCP_EXECUTABLE: packages/database-mcp/dist/bin/${{ matrix.executable }}
+      MCP_ARCHIVE: ngandu-database-mcp-v${{ needs.release.outputs.database_mcp_version }}-${{ matrix.platform }}-${{ matrix.arch }}.tar.gz
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bun run build
+      - name: Compile native executable
+        shell: bash
+        env:
+          MCP_BINARY_OUTFILE: dist/bin/${{ matrix.executable }}
+        run: bun run --filter @ngandu-dev/database-mcp compile
+      - name: Smoke native executable
+        shell: bash
+        run: |
+          "${MCP_EXECUTABLE}" --version | grep -Fx "${MCP_VERSION}"
+          "${MCP_EXECUTABLE}" --help
+          bun packages/database-mcp/scripts/smoke-binary.ts "${MCP_EXECUTABLE}"
+      - name: Archive native executable
+        shell: bash
+        run: tar -czf "${MCP_ARCHIVE}" -C packages/database-mcp/dist/bin "${{ matrix.executable }}"
+      - uses: actions/upload-artifact@v6
+        with:
+          name: database-mcp-${{ matrix.platform }}-${{ matrix.arch }}
+          path: ${{ env.MCP_ARCHIVE }}
+          if-no-files-found: error
+
+  database-mcp-release-assets:
+    needs: [release, database-mcp-native]
+    if: needs.release.outputs.database_mcp_published == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v6
+        with:
+          pattern: database-mcp-*
+          merge-multiple: true
+          path: artifacts
+      - name: Generate SHA-256 checksums
+        working-directory: artifacts
+        run: sha256sum *.tar.gz > SHA256SUMS
+      - name: Attach assets to the Changesets release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MCP_VERSION: ${{ needs.release.outputs.database_mcp_version }}
+        run: >-
+          gh release upload "@ngandu-dev/database-mcp@${MCP_VERSION}"
+          artifacts/*.tar.gz artifacts/SHA256SUMS --clobber

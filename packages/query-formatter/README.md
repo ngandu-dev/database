@@ -58,11 +58,11 @@ bun run --filter @ngandu-dev/query-formatter test
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) and the repository pull request template.
+See the repository [contributing guide](../../CONTRIBUTING.md), [Code of Conduct](../../CODE_OF_CONDUCT.md), and pull request template.
 
 ## Security
 
-Please report vulnerabilities privately according to [SECURITY.md](SECURITY.md).
+Please report vulnerabilities privately according to the repository [security policy](../../SECURITY.md).
 
 ## License
 

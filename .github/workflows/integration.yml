@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "packages/database/**"
+      - "packages/database-mcp/**"
       - "packages/query-builder/**"
       - "bun.lock"
       - ".github/workflows/integration.yml"
@@ -35,6 +36,9 @@ jobs:
           DATAZEN_FUNCTIONAL_CONFIG_FILE: ci/github/vitest/sqlite3.json
         working-directory: packages/database
         run: bun run test:functional
+      - run: bun run build
+      - name: Run SQLite MCP protocol tests
+        run: bun run --filter @ngandu-dev/database-mcp test
 
   mysql:
     runs-on: ubuntu-latest
@@ -69,6 +73,17 @@ jobs:
           DATAZEN_FUNCTIONAL_CONFIG_FILE: ci/github/vitest/mysql.json
         working-directory: packages/database
         run: bun run test:functional
+      - run: bun run build
+      - name: Provision read-only MCP account
+        env:
+          MCP_TEST_DRIVER: mysql
+          MCP_ADMIN_DATABASE_URL: mysql://root:root@127.0.0.1:3306/datazen
+        run: bun packages/database-mcp/scripts/setup-integration-reader.ts
+      - name: Run MySQL MCP protocol tests
+        env:
+          MCP_TEST_DRIVER: mysql
+          MCP_READER_DATABASE_URL: mysql://datazen_reader:reader@127.0.0.1:3306/datazen
+        run: bun run --filter @ngandu-dev/database-mcp test
 
   mariadb:
     runs-on: ubuntu-latest
@@ -103,6 +118,17 @@ jobs:
           DATAZEN_FUNCTIONAL_CONFIG_FILE: ci/github/vitest/mariadb.json
         working-directory: packages/database
         run: bun run test:functional
+      - run: bun run build
+      - name: Provision read-only MCP account
+        env:
+          MCP_TEST_DRIVER: mariadb
+          MCP_ADMIN_DATABASE_URL: mysql://root:root@127.0.0.1:3306/datazen
+        run: bun packages/database-mcp/scripts/setup-integration-reader.ts
+      - name: Run MariaDB MCP protocol tests
+        env:
+          MCP_TEST_DRIVER: mariadb
+          MCP_READER_DATABASE_URL: mariadb://datazen_reader:reader@127.0.0.1:3306/datazen
+        run: bun run --filter @ngandu-dev/database-mcp test
 
   postgresql:
     runs-on: ubuntu-latest
@@ -136,6 +162,17 @@ jobs:
           DATAZEN_FUNCTIONAL_CONFIG_FILE: ci/github/vitest/postgresql.json
         working-directory: packages/database
         run: bun run test:functional
+      - run: bun run build
+      - name: Provision read-only MCP account
+        env:
+          MCP_TEST_DRIVER: postgresql
+          MCP_ADMIN_DATABASE_URL: postgresql://datazen:datazen@127.0.0.1:5432/datazen
+        run: bun packages/database-mcp/scripts/setup-integration-reader.ts
+      - name: Run PostgreSQL MCP protocol tests
+        env:
+          MCP_TEST_DRIVER: postgresql
+          MCP_READER_DATABASE_URL: postgresql://datazen_reader:reader@127.0.0.1:5432/datazen
+        run: bun run --filter @ngandu-dev/database-mcp test
 
   sqlserver:
     runs-on: ubuntu-latest
@@ -168,3 +205,14 @@ jobs:
           DATAZEN_FUNCTIONAL_CONFIG_FILE: ci/github/vitest/sqlserver.json
         working-directory: packages/database
         run: bun run test:functional
+      - run: bun run build
+      - name: Provision read-only MCP account
+        env:
+          MCP_TEST_DRIVER: sqlserver
+          MCP_ADMIN_DATABASE_URL: mssql://sa:Datazen123%21@127.0.0.1:1433/master?encrypt=false&trustServerCertificate=true
+        run: bun packages/database-mcp/scripts/setup-integration-reader.ts
+      - name: Run SQL Server MCP protocol tests
+        env:
+          MCP_TEST_DRIVER: sqlserver
+          MCP_READER_DATABASE_URL: mssql://datazen_reader:reader@127.0.0.1:1433/datazen?encrypt=false&trustServerCertificate=true
+        run: bun run --filter @ngandu-dev/database-mcp test

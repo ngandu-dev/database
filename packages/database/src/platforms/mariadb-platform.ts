@@ -6,6 +6,10 @@ import { MariaDBKeywords } from "./keywords/mariadb-keywords";
 import { MySQLMetadataProvider } from "./mysql/mysql-metadata-provider";
 
 export class MariaDBPlatform extends AbstractMySQLPlatform {
+  public override getListDatabasesSQL(): string {
+    return "SHOW DATABASES";
+  }
+
   public getColumnTypeSQLSnippet(tableAlias: string, databaseName: string): string {
     const subQueryAlias = `i_${tableAlias}`;
     const quotedDatabaseName = this.quoteStringLiteral(databaseName);

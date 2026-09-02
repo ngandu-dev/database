@@ -7,6 +7,10 @@ import { Sequence } from "./sequence";
 import { View } from "./view";
 
 export class PostgreSQLSchemaManager extends AbstractSchemaManager {
+  protected override getListDatabasesSQL(): string {
+    return this.platform.getListDatabasesSQL();
+  }
+
   public async listSchemaNames(): Promise<string[]> {
     const rows = await this.connection.fetchFirstColumn<unknown>(`
 SELECT schema_name
@@ -27,7 +31,11 @@ AND    schema_name != 'information_schema'
   }
 
   protected getListViewNamesSQL(): string {
-    return "SELECT viewname FROM pg_catalog.pg_views WHERE schemaname = current_schema() ORDER BY viewname";
+    return `SELECT quote_ident(schemaname) || '.' || quote_ident(viewname)
+FROM pg_catalog.pg_views
+WHERE schemaname NOT LIKE 'pg\\_%'
+  AND schemaname != 'information_schema'
+ORDER BY schemaname, viewname`;
   }
 
   protected override async determineCurrentSchemaName(): Promise<string | null> {

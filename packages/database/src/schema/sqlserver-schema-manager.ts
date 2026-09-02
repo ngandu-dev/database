@@ -19,6 +19,10 @@ export class SQLServerSchemaManager extends AbstractSchemaManager {
     await this.loadDatabaseCollation();
   }
 
+  protected override getListDatabasesSQL(): string {
+    return this.platform.getListDatabasesSQL();
+  }
+
   public async listSchemaNames(): Promise<string[]> {
     const rows = await this.connection.fetchFirstColumn<unknown>(`
 SELECT name
@@ -42,7 +46,7 @@ WHERE  name NOT IN('guest', 'INFORMATION_SCHEMA', 'sys')
   }
 
   protected getListViewNamesSQL(): string {
-    return "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = SCHEMA_NAME() AND TABLE_TYPE = 'VIEW' ORDER BY TABLE_NAME";
+    return "SELECT QUOTENAME(TABLE_SCHEMA) + '.' + QUOTENAME(TABLE_NAME) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'VIEW' ORDER BY TABLE_SCHEMA, TABLE_NAME";
   }
 
   protected override async determineCurrentSchemaName(): Promise<string | null> {

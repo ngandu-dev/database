@@ -25,6 +25,10 @@ export class MySQLSchemaManager extends AbstractSchemaManager {
     await this.ensureComparatorMetadataLoaded();
   }
 
+  protected override getListDatabasesSQL(): string {
+    return this.platform.getListDatabasesSQL();
+  }
+
   public override createComparator(config: ComparatorConfig = new ComparatorConfig()): Comparator {
     const defaultCharset = this.databaseDefaultCharset ?? "";
     const defaultCollation =

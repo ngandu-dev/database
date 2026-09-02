@@ -1,0 +1,64 @@
+{
+  "name": "@ngandu-dev/database-mcp",
+  "version": "1.0.0",
+  "description": "A local database context and SQL execution MCP server powered by @ngandu-dev/database.",
+  "license": "MIT",
+  "author": "Bernard Ngandu <bernard@ngandu.dev>",
+  "type": "module",
+  "bin": {
+    "ngandu-database-mcp": "./dist/cli.js"
+  },
+  "files": [
+    "dist/cli.js",
+    "dist/cli.js.map",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=20.17.0"
+  },
+  "scripts": {
+    "build": "tsup",
+    "compile": "bun run scripts/compile.ts",
+    "dev": "bun run src/cli/index.ts",
+    "format": "biome check --write src scripts",
+    "lint": "biome lint src scripts",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
+    "test": "bun run build && vitest run",
+    "test:coverage": "bun run build && vitest run --coverage",
+    "check:package": "publint"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.0.0",
+    "@ngandu-dev/database": "3.0.3",
+    "mssql": "^12.7.0",
+    "mysql2": "^3.23.3",
+    "pg": "^8.23.0",
+    "sqlite3": "^6.0.1",
+    "zod": "^4.2.0"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "^2.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "database",
+    "postgresql",
+    "mysql",
+    "sql-server",
+    "sqlite"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ngandu-dev/database.git",
+    "directory": "packages/database-mcp"
+  },
+  "bugs": {
+    "url": "https://github.com/ngandu-dev/database/issues"
+  },
+  "homepage": "https://github.com/ngandu-dev/database/tree/main/packages/database-mcp#readme",
+  "publishConfig": {
+    "access": "public"
+  }
+}
