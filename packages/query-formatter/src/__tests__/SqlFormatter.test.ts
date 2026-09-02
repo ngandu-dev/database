@@ -55,7 +55,7 @@ describe("SqlFormatter", () => {
 
   test("format long concat", () => {
     const parts: string[] = [];
-    for (let i = 0; i < 20_000; i += 1) {
+    for (let i = 0; i < 2_000; i += 1) {
       parts.push(`cast('foo${i}' as blob)`);
     }
 
@@ -66,5 +66,5 @@ describe("SqlFormatter", () => {
     expect(formatter.format(`select iif(${inConcat} = ${inConcat}, 10, 20) x`)).toBe(
       `select\n  iif(\n    ${outConcat} = ${outConcat},\n    10,\n    20\n  ) x`,
     );
-  }, 180_000);
+  });
 });

@@ -14,8 +14,8 @@
     "format:check": "biome check .",
     "lint": "biome lint .",
     "typecheck": "bun run --filter '*' typecheck",
-    "test": "bun run --filter '*' test",
-    "test:coverage": "bun run --filter '*' test:coverage",
+    "test": "bun run --sequential --filter '*' test",
+    "test:coverage": "bun run --sequential --filter '*' test:coverage",
     "quality": "bun run format:check && bun run lint && bun run typecheck && bun run test && bun run build && bun run check:package",
     "version": "changeset version",
     "release": "changeset publish"
