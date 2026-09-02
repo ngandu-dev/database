@@ -9,6 +9,9 @@ export default defineConfig({
       "@ngandu-dev/database/types": fileURLToPath(
         new URL("../database/src/types/_index.ts", import.meta.url),
       ),
+      "@ngandu-dev/query-builder": fileURLToPath(
+        new URL("../query-builder/src/index.ts", import.meta.url),
+      ),
     },
   },
   test: {

@@ -20,13 +20,14 @@
   },
   "scripts": {
     "build": "tsup",
+    "build:workspace-dependencies": "bun run --filter @ngandu-dev/query-builder build && bun run --filter @ngandu-dev/database build",
     "compile": "bun run scripts/compile.ts",
     "dev": "bun run src/cli/index.ts",
     "format": "biome check --write src scripts",
     "lint": "biome lint src scripts",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
-    "test": "bun run build && vitest run",
-    "test:coverage": "bun run build && vitest run --coverage",
+    "test": "bun run build:workspace-dependencies && bun run build && vitest run",
+    "test:coverage": "bun run build:workspace-dependencies && bun run build && vitest run --coverage",
     "check:package": "publint"
   },
   "dependencies": {
