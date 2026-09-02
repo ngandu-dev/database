@@ -4,6 +4,11 @@
   "exclude": ["src/**/*.test.ts"],
   "compilerOptions": {
     "outDir": "dist",
+    "paths": {
+      "@ngandu-dev/database": ["packages/database/src/_index.ts"],
+      "@ngandu-dev/database/types": ["packages/database/src/types/_index.ts"],
+      "@ngandu-dev/query-builder": ["packages/query-builder/src/index.ts"]
+    },
     "types": ["node", "bun"]
   }
 }
