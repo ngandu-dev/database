@@ -40,6 +40,12 @@
     "vitest": "^4.1.11"
   },
   "overrides": {
-    "esbuild": "0.28.1"
+    "esbuild": "0.28.1",
+    "launch-editor": "^2.14.2",
+    "shell-quote": "^1.11.0",
+    "source-map-js": "^1.2.2",
+    "vite": "8.2.4",
+    "undici": "^6.28.1",
+    "tedious": "^20.3.6"
   }
 }

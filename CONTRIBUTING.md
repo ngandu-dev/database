@@ -45,7 +45,7 @@ Push a repository version tag such as `v3.0.3` to publish all unpublished worksp
 package tag such as `@ngandu-dev/database@3.0.3` to publish only that package. Package tags must match
 its committed version; publish changed dependencies first when using package tags.
 
-The `release.yml` workflow validates the workspace, publishes to npm using the configured trusted
+The `release.yml` workflow runs quality checks, tests, and a dependency audit before it publishes to npm using the configured trusted
 publisher, and creates a GitHub release with generated notes. Existing npm versions are skipped on
 retries. Releases containing `database-mcp` also receive native executables and checksums.
 Prerelease tags and workspace versions are excluded from automatic releases; handle prereleases manually.

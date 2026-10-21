@@ -41,7 +41,10 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - run: npm install --global npm@latest
       - run: bun install --frozen-lockfile
-      - run: bun run quality
+      - name: Run quality checks and tests
+        run: bun run quality
+      - name: Audit locked dependencies
+        run: bun audit
       - name: Publish tagged packages to npm with trusted publishing
         id: database_mcp
         env:

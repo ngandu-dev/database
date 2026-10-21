@@ -1,5 +1,11 @@
 # @ngandu-dev/query-formatter
 
+## 2.0.2
+
+### Patch Changes
+
+- Update the locked dependency graph to patched development tools and require quality checks, tests, and a security audit to pass before publishing stable tags. Raise MCP SDK dependency minimums to 2.3.1, update the SQL Server driver dependency to remove sprintf-js, and update the native build dependency on Undici within its supported major version.
+
 ## 2.0.1
 
 ### Patch Changes
