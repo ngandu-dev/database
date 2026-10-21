@@ -26,9 +26,9 @@
     },
     "packages/database": {
       "name": "@ngandu-dev/database",
-      "version": "3.0.2",
+      "version": "3.0.4",
       "dependencies": {
-        "@ngandu-dev/query-builder": "^3.0.2",
+        "@ngandu-dev/query-builder": "^3.0.3",
         "semver": "^7.7.4",
       },
       "peerDependencies": {
@@ -46,13 +46,13 @@
     },
     "packages/database-mcp": {
       "name": "@ngandu-dev/database-mcp",
-      "version": "0.1.0",
+      "version": "1.0.1",
       "bin": {
         "ngandu-database-mcp": "./dist/cli.js",
       },
       "dependencies": {
         "@modelcontextprotocol/server": "^2.0.0",
-        "@ngandu-dev/database": "^3.0.2",
+        "@ngandu-dev/database": "3.0.4",
         "mssql": "^12.7.0",
         "mysql2": "^3.23.3",
         "pg": "^8.23.0",
@@ -65,11 +65,11 @@
     },
     "packages/query-builder": {
       "name": "@ngandu-dev/query-builder",
-      "version": "3.0.2",
+      "version": "3.0.3",
     },
     "packages/query-formatter": {
       "name": "@ngandu-dev/query-formatter",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "bin": {
         "sql-forge": "./dist/sql-forge.js",
       },

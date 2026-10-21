@@ -1,5 +1,11 @@
 # @ngandu-dev/query-builder
 
+## 3.0.3
+
+### Patch Changes
+
+- Run release automation on stable tag pushes, publish npm packages through trusted publishing, and create GitHub releases with generated notes. Leave prereleases to manual publishing.
+
 ## 3.0.2
 
 ### Changed

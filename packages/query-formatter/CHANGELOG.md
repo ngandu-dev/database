@@ -1,5 +1,11 @@
 # @ngandu-dev/query-formatter
 
+## 2.0.1
+
+### Patch Changes
+
+- Run release automation on stable tag pushes, publish npm packages through trusted publishing, and create GitHub releases with generated notes. Leave prereleases to manual publishing.
+
 ## 2.0.0
 
 ### Changed

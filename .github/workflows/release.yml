@@ -1,6 +1,10 @@
 name: Release
 
 on:
+  push:
+    tags:
+      - "**"
+      - "!**[0-9]+.[0-9]+.[0-9]+-*"
   workflow_dispatch:
 
 concurrency:
@@ -10,48 +14,84 @@ concurrency:
 permissions:
   contents: write
   id-token: write
-  pull-requests: write
 
 jobs:
   release:
+    if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     outputs:
       database_mcp_published: ${{ steps.database_mcp.outputs.published }}
       database_mcp_version: ${{ steps.database_mcp.outputs.version }}
     steps:
+      - name: Verify stable release tag
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          if [[ "$RELEASE_TAG" =~ [0-9]+\.[0-9]+\.[0-9]+- ]]; then
+            echo "Prerelease tags are handled manually."
+            exit 1
+          fi
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - uses: actions/setup-node@v6
         with:
           node-version: "24"
-          registry-url: https://registry.npmjs.org
           package-manager-cache: false
       - uses: oven-sh/setup-bun@v2
       - run: npm install --global npm@latest
       - run: bun install --frozen-lockfile
       - run: bun run quality
-      - name: Create release pull request or publish changed packages
-        id: changesets
-        uses: changesets/action@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          publish-script: bun run release
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: "true"
-      - name: Detect database MCP publication
+      - name: Publish tagged packages to npm with trusted publishing
         id: database_mcp
         env:
-          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.published-packages }}
+          RELEASE_TAG: ${{ github.ref_name }}
         run: |
           node <<'NODE'
           const fs = require("node:fs");
-          const packages = JSON.parse(process.env.PUBLISHED_PACKAGES || "[]");
-          const published = packages.find((item) => item.name === "@ngandu-dev/database-mcp");
-          fs.appendFileSync(process.env.GITHUB_OUTPUT, `published=${published ? "true" : "false"}\n`);
-          fs.appendFileSync(process.env.GITHUB_OUTPUT, `version=${published?.version ?? ""}\n`);
+          const { execFileSync, spawnSync } = require("node:child_process");
+          // Publish workspace dependencies before their dependants.
+          const directories = ["query-builder", "query-formatter", "database", "database-mcp"];
+          const packages = directories.map((directory) => ({
+            directory: `packages/${directory}`,
+            ...JSON.parse(fs.readFileSync(`packages/${directory}/package.json`, "utf8")),
+          }));
+          const tag = process.env.RELEASE_TAG;
+          const stablePackages = packages.filter((pkg) => !pkg.version.split("+")[0].includes("-"));
+          const selected = tag.startsWith("@")
+            ? stablePackages.filter((pkg) => tag === `${pkg.name}@${pkg.version}`)
+            : stablePackages;
+          if (!selected.length || (!tag.startsWith("@") && !/^v?\d+\.\d+\.\d+(?:\+[0-9A-Za-z.-]+)?$/.test(tag))) {
+            throw new Error(`Tag ${tag} must be a version or match a workspace package and version`);
+          }
+          for (const pkg of selected) {
+            const result = spawnSync("npm", ["view", `${pkg.name}@${pkg.version}`, "version", "--json", "--registry", "https://registry.npmjs.org"], { encoding: "utf8" });
+            if (result.status === 0) {
+              console.log(`Skipping already published ${pkg.name}@${pkg.version}`);
+              continue;
+            }
+            let code;
+            try { code = JSON.parse(result.stdout).error?.code; } catch {}
+            if (code !== "E404") {
+              throw new Error(result.stderr || result.error?.message || "Unable to check npm package version");
+            }
+            execFileSync("npm", ["publish", "--access", "public", "--tag", "latest", "--registry", "https://registry.npmjs.org"], {
+              cwd: pkg.directory,
+              stdio: "inherit",
+            });
+          }
+          const mcp = selected.find((pkg) => pkg.name === "@ngandu-dev/database-mcp");
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `published=${Boolean(mcp)}\nversion=${mcp?.version ?? ""}\n`);
           NODE
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" --verify-tag --generate-notes
+          fi
 
   database-mcp-native:
     needs: release
@@ -129,10 +169,11 @@ jobs:
       - name: Generate SHA-256 checksums
         working-directory: artifacts
         run: sha256sum *.tar.gz > SHA256SUMS
-      - name: Attach assets to the Changesets release
+      - name: Attach assets to the tag release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MCP_VERSION: ${{ needs.release.outputs.database_mcp_version }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
         run: >-
-          gh release upload "@ngandu-dev/database-mcp@${MCP_VERSION}"
+          gh release upload "${RELEASE_TAG}"
           artifacts/*.tar.gz artifacts/SHA256SUMS --clobber

@@ -1,6 +1,6 @@
 {
   "name": "@ngandu-dev/database-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A local database context and SQL execution MCP server powered by @ngandu-dev/database.",
   "license": "MIT",
   "author": "Bernard Ngandu <bernard@ngandu.dev>",
@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/server": "^2.0.0",
-    "@ngandu-dev/database": "3.0.3",
+    "@ngandu-dev/database": "3.0.4",
     "mssql": "^12.7.0",
     "mysql2": "^3.23.3",
     "pg": "^8.23.0",
